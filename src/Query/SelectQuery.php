@@ -1,12 +1,9 @@
 <?php
 namespace Database\Query;
 
-/**
- * @method SelectQuery where()
- */
 class SelectQuery extends AbstractQuery
 {
-	use Parts\WhereTrait, Parts\GroupByTrait, Parts\OrderByTrait, Parts\LimitTrait;
+	use Traits\JoinTrait, Traits\WhereTrait, Traits\GroupByTrait, Traits\OrderByTrait, Traits\LimitTrait;
 	
 	/**
 	 * Set the table to select from

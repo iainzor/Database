@@ -12,7 +12,10 @@ class SqlGeneratorTest extends \PHPUnit_Framework_TestCase
 		$query = Tests\Query\ComplexSelectQuery::create();
 		$sql = $factory->sqlGenerator()->generate($query);
 		$cleaned = preg_replace("/\n/", " ", $sql);
+		$expected = "SELECT * FROM `players` AS `players` "
+				  . "JOIN `servers` AS `servers` ON `players`.`serverId` = `servers`.`id` "
+				  . "WHERE (id > :maxId AND name LIKE :name) OR (role = 'admin')";
 		
-		$this->assertNotEmpty($cleaned);
+		$this->assertEquals($expected, $cleaned);
 	}
 }

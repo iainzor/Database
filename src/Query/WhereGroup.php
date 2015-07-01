@@ -16,15 +16,22 @@ class WhereGroup
 	private $compare = QueryInterface::COMPARE_AND;
 	
 	/**
+	 * @var int
+	 */
+	private $linkCompare = QueryInterface::COMPARE_AND;
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param array $exprs
 	 * @param int $compare
+	 * @param int $linkCompare
 	 */
-	public function __construct(array $exprs, $compare = QueryInterface::COMPARE_AND)
+	public function __construct(array $exprs, $compare = QueryInterface::COMPARE_AND, $linkCompare = QueryInterface::COMPARE_AND)
 	{
 		$this->exprs($exprs);
 		$this->compare = $compare;
+		$this->linkCompare = $linkCompare;
 	}
 	
 	/**
@@ -43,7 +50,7 @@ class WhereGroup
 			foreach ($exprs as $key => $expr) {
 				if (!($expr instanceof WhereExpr)) {
 					if (!is_numeric($key)) {
-						$expr = "{$key} = {$expr}";
+						$expr = [$key, "=", $expr];
 					}
 					
 					$expr = new WhereExpr($expr);
@@ -67,5 +74,19 @@ class WhereGroup
 			$this->compare = (int) $compare;
 		}
 		return $this->compare;
+	}
+	
+	/**
+	 * Define how this group should be linked to other groups in a query
+	 * 
+	 * @param int $compare
+	 * @return int
+	 */
+	public function linkCompare($compare = null)
+	{
+		if ($compare !== null) {
+			$this->linkCompare = (int) $compare;
+		}
+		return $this->linkCompare;
 	}
 }

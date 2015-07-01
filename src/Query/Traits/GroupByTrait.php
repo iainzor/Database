@@ -1,5 +1,5 @@
 <?php
-namespace Database\Query\Parts;
+namespace Database\Query\Traits;
 
 trait GroupByTrait
 {
