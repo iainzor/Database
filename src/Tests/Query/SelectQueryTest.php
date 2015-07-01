@@ -25,7 +25,8 @@ class SelectQueryTest extends \PHPUnit_Framework_Testcase
 	public function testWhere()
 	{
 		$query = new SelectQuery();
-		$query->from("datacenters")->where([
+		$query->from("datacenters");
+		$query->where([
 			"id" => 1
 		]);
 		
@@ -35,7 +36,8 @@ class SelectQueryTest extends \PHPUnit_Framework_Testcase
 	public function testGroupBy()
 	{
 		$query = new SelectQuery();
-		$query->from("datacenters")->groupBy("name");
+		$query->from("datacenters");
+		$query->groupBy("name");
 		
 		$this->assertCount(1, $query->groupings());
 	}
@@ -43,7 +45,8 @@ class SelectQueryTest extends \PHPUnit_Framework_Testcase
 	public function testOrderBy()
 	{
 		$query = new SelectQuery();
-		$query->from("datacenters")->orderBy([
+		$query->from("datacenters");
+		$query->orderBy([
 			"displayName" => SelectQuery::SORT_ASC
 		]);
 		
@@ -53,7 +56,8 @@ class SelectQueryTest extends \PHPUnit_Framework_Testcase
 	public function testLimit()
 	{
 		$query = new SelectQuery();
-		$query->from("datacenters")->limit(1);
+		$query->from("datacenters");
+		$query->limit(1);
 		
 		$this->assertEquals(1, $query->maxResults());
 		$this->assertEquals(0, $query->resultOffset());

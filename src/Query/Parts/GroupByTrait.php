@@ -20,8 +20,6 @@ trait GroupByTrait
 		}
 		
 		$this->groupings += $columns;
-		
-		return $this;
 	}
 	
 	/**

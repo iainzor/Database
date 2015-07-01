@@ -23,8 +23,6 @@ trait LimitTrait
 	{
 		$this->maxResults = (int) $maxResults;
 		$this->resultOffset = (int) $resultOffset;
-		
-		return $this;
 	}
 	
 	/**

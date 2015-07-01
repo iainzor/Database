@@ -14,6 +14,51 @@ class PDO extends \PDO
 	private $schemaName;
 	
 	/**
+	 * @var string
+	 */
+	private $driver;
+	
+	/**
+	 * Overrides the default constructor to keep track of the driver being used
+	 * 
+	 * @param string $dsn
+	 * @param string $username
+	 * @param string $passwd
+	 * @param string $options
+	 */
+	public function __construct($dsn, $username = null, $passwd = null, $options = []) 
+	{
+		parent::__construct($dsn, $username, $passwd, $options);
+		
+		$this->driver = preg_replace("/^([a-z0-9]+):.*$/i", "$1", $dsn);
+	}
+	
+	/**
+	 * Get the name of the driver being used
+	 * 
+	 * @return string
+	 */
+	public function driver()
+	{
+		return $this->driver;
+	}
+	
+	/**
+	 * Attempt to get the factory for the database driver
+	 * 
+	 * @return \Database\Driver\DriverFactoryInterface
+	 * @throws \Exception
+	 */
+	public function driverFactory()
+	{
+		$className = __NAMESPACE__ ."\\Driver\\". ucfirst($this->driver) ."\\DriverFactory";
+		if (class_exists($className)) {
+			return new $className();
+		}
+		throw new \Exception("No driver factory found for '{$this->driver}'");
+	}
+	
+	/**
 	 * Get the name of the database currently connected to
 	 * 
 	 * @return string
@@ -121,26 +166,6 @@ class PDO extends \PDO
 	}
 	
 	/**
-	 * Override the default prepare method in order to log the statement
-	 * 
-	 * @param string $statement
-	 * @param array $options
-	 * @return \PDOStatement
-	 */
-	public function prepare($statement, $options = null) {
-		if ($options === null) {
-			$options = [];
-		}
-		
-		$this->logs[] = [
-			"sql" => $statement,
-			"options" => $options
-		];
-		
-		return parent::prepare($statement, $options);
-	}
-	
-	/**
 	 * Create a PDOStatement from a SQL string, execute it, log it and return it
 	 * 
 	 * @param string $sql
@@ -149,10 +174,6 @@ class PDO extends \PDO
 	 */
 	private function _exec($sql, array $params = [])
 	{
-		if ($sql instanceof Query\Query) {
-			$sql = $sql->sql($this);
-		}
-		
 		$startTime = microtime(true);
 		$statement = $this->prepare($sql);
 		$statement->execute($params);

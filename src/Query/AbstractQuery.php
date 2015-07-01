@@ -1,14 +1,44 @@
 <?php
 namespace Database\Query;
 
-use Database\Table;
+use Database\Table,
+	Database\PDO;
 
 abstract class AbstractQuery implements QueryInterface
 {
 	/**
+	 * @var PDO
+	 */
+	protected $db;
+	
+	/**
 	 * @var \Database\Table\AbstractTable
 	 */
 	protected $table;
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param PDO $db
+	 */
+	public function __construct(PDO $db = null)
+	{
+		$this->db($db);
+	}
+	
+	/**
+	 * Get or set the PDO instance
+	 * 
+	 * @param PDO $db
+	 * @return PDO
+	 */
+	public function db(PDO $db = null)
+	{
+		if ($db !== null) {
+			$this->db = $db;
+		}
+		return $this->db;
+	}
 	
 	/**
 	 * Get or set the table to run the query on

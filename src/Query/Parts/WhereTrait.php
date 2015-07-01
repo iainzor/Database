@@ -1,7 +1,8 @@
 <?php
 namespace Database\Query\Parts;
 
-use Database\Query\QueryInterface;
+use Database\Query\QueryInterface,
+	Database\Query\WhereGroup;
 
 trait WhereTrait
 {
@@ -23,8 +24,6 @@ trait WhereTrait
 		}
 		
 		$this->whereGroups[] = new WhereGroup($conditions, $compare);
-		
-		return $this;
 	}
 	
 	/**
