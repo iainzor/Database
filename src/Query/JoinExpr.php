@@ -7,19 +7,24 @@ use Database\Table\AbstractTable,
 class JoinExpr
 {
 	/**
+	 * @var AbstractQuery
+	 */
+	private $query;
+	
+	/**
 	 * @var AbstractTable
 	 */
 	private $foreignTable;
 	
 	/**
-	 * @var AbstractTable
-	 */
-	private $localTable;
-	
-	/**
 	 * @var array
 	 */
 	private $foreignKeys = [];
+	
+	/**
+	 * @var AbstractTable
+	 */
+	private $localTable;
 	
 	/**
 	 * @var array
@@ -34,14 +39,19 @@ class JoinExpr
 	/**
 	 * Constructor
 	 * 
+	 * @param AbstractQuery $query The base query the join expression is for
 	 * @param string|array|AbstractTable $foreignTable
 	 * @param string|array $foreignKeys
+	 * @param string|array $localKeys
 	 * @param int $type
 	 */
-	public function __construct($foreignTable, $foreignKeys, $type = QueryInterface::JOIN_DEFAULT) 
+	public function __construct(AbstractQuery $query, $foreignTable, $foreignKeys, $localKeys = null, $type = QueryInterface::JOIN_DEFAULT) 
 	{
+		$this->query = $query;
+		
 		$this->foreignTable($foreignTable);
 		$this->foreignKeys($foreignKeys);
+		$this->localKeys($localKeys);
 		$this->type($type);
 	}
 	
@@ -50,11 +60,14 @@ class JoinExpr
 	 * 
 	 * @param string|array|AbstractTable $localTable
 	 * @param string|array $localKeys
+	 * @return JoinExpr
 	 */
 	public function on($localTable, $localKeys)
 	{
 		$this->localTable($localTable);
 		$this->localKeys($localKeys);
+		
+		return $this;
 	}
 	
 	/**
@@ -81,6 +94,9 @@ class JoinExpr
 	{
 		if ($table !== null) {
 			$this->localTable = $this->_createTable($table);
+		}
+		if (!$this->localTable) {
+			$this->localTable = $this->query->table();
 		}
 		return $this->localTable;
 	}
@@ -128,7 +144,8 @@ class JoinExpr
 	}
 	
 	/**
-	 * Create a table from the argument provided
+	 * Create a table from the argument provided.  If the table provided
+	 * matches the base query's table, that table will be returned instead
 	 * 
 	 * @param string|array|AbstractTable $table
 	 * @return AbstractTable
@@ -147,6 +164,10 @@ class JoinExpr
 		
 		if (!($table instanceof AbstractTable)) {
 			throw new \UnexpectedValueException("Table must be a string, array or instance of \\Database\\Table\\AbstractTable");
+		}
+		
+		if ($table->alias() === $this->query->table()->alias()) {
+			return $this->query->table();
 		}
 		
 		return $table;

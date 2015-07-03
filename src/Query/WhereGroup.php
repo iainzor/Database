@@ -1,10 +1,16 @@
 <?php
 namespace Database\Query;
 
-use Database\Query\QueryInterface;
+use Database\Query\QueryInterface,
+	Database\Query\AbstractQuery;
 
 class WhereGroup
 {
+	/**
+	 * @var AbstractQuery
+	 */
+	private $query;
+	
 	/**
 	 * @var array
 	 */
@@ -23,15 +29,18 @@ class WhereGroup
 	/**
 	 * Constructor
 	 * 
+	 * @param AbstractQuery $query
 	 * @param array $exprs
 	 * @param int $compare
 	 * @param int $linkCompare
 	 */
-	public function __construct(array $exprs, $compare = QueryInterface::COMPARE_AND, $linkCompare = QueryInterface::COMPARE_AND)
+	public function __construct(AbstractQuery $query, array $exprs, $compare = QueryInterface::COMPARE_AND, $linkCompare = QueryInterface::COMPARE_AND)
 	{
-		$this->exprs($exprs);
+		$this->query = $query;
 		$this->compare = $compare;
 		$this->linkCompare = $linkCompare;
+		
+		$this->exprs($exprs);
 	}
 	
 	/**
@@ -53,7 +62,7 @@ class WhereGroup
 						$expr = [$key, "=", $expr];
 					}
 					
-					$expr = new WhereExpr($expr);
+					$expr = new WhereExpr($this->query, $expr);
 				}
 				$this->exprs[] = $expr;
 			}

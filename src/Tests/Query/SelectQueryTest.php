@@ -62,4 +62,13 @@ class SelectQueryTest extends \PHPUnit_Framework_Testcase
 		$this->assertEquals(1, $query->maxResults());
 		$this->assertEquals(0, $query->resultOffset());
 	}
+	
+	public function testMatchingTables()
+	{
+		$query = new SelectQuery();
+		$query->from("users");
+		$joinExpr = $query->join("roles", "id")->on("users", "roleId");
+		
+		$this->assertSame($query->table(), $joinExpr->localTable());
+	}
 }

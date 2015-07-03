@@ -27,12 +27,13 @@ trait JoinTrait
 	 * 
 	 * @param string|array|AbstractTable $foreignTable
 	 * @param string|array $foreignKeys
+	 * @param string|array $localKeys
 	 * @param int $type
 	 * @return JoinExpr
 	 */
-	public function join($foreignTable, $foreignKeys, $type = QueryInterface::JOIN_DEFAULT)
+	public function join($foreignTable, $foreignKeys, $localKeys = null, $type = QueryInterface::JOIN_DEFAULT)
 	{
-		$expr = new JoinExpr($foreignTable, $foreignKeys, $type);
+		$expr = new JoinExpr($this, $foreignTable, $foreignKeys, $localKeys, $type);
 		$this->joins[] = $expr;
 		
 		return $expr;
@@ -43,10 +44,11 @@ trait JoinTrait
 	 * 
 	 * @param string|array|AbstractTable $foreignTable
 	 * @param string|array $foreignKeys
+	 * @param string|array $localKeys
 	 * @return JoinExpr
 	 */
-	public function leftJoin($foreignTable, $foreignKeys)
+	public function leftJoin($foreignTable, $foreignKeys, $localKeys)
 	{
-		return $this->join($foreignTable, $foreignKeys, QueryInterface::JOIN_LEFT);
+		return $this->join($foreignTable, $foreignKeys, $localKeys, QueryInterface::JOIN_LEFT);
 	}
 }

@@ -24,7 +24,7 @@ trait WhereTrait
 			$conditions = [$conditions];
 		}
 		
-		$this->whereGroups[] = new WhereGroup($conditions, $compare, $linkCompare);
+		$this->whereGroups[] = new WhereGroup($this, $conditions, $compare, $linkCompare);
 	}
 	
 	/**

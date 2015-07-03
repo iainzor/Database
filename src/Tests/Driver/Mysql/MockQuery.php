@@ -1,11 +1,11 @@
 <?php
-namespace Database\Tests\Query;
+namespace Database\Tests\Driver\Mysql;
 
 use Database\Table,
 	Database\Query,
 	Database\Tests\TestDb;
 
-class ComplexSelectQuery
+class MockQuery
 {
 	public static function create()
 	{
@@ -14,10 +14,12 @@ class ComplexSelectQuery
 		
 		$query = new Query\SelectQuery(TestDb::pdo());
 		$query->from($players);
-		$query->join($servers, "id")->on($players, "serverId");
+		$query->join($servers, "id", "serverId");
+		$query->leftJoin("suspensions", "playerId", "id");
 		$query->where([
-			"id > :maxId",
-			"name LIKE :name"
+			["id", ">", ":maxId"],
+			["name", "LIKE", ":name"],
+			[$servers->column("id"), "IS NOT NULL"]
 		]);
 		$query->orWhere([
 			"role" => "admin"

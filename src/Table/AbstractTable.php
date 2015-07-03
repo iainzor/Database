@@ -52,5 +52,8 @@ abstract class AbstractTable
 		return isset($this->alias) ? $this->alias : $this->name();
 	}
 
-	public function parseRow(array $row) {}
+	public function column($name)
+	{
+		return $name;
+	}
 }
