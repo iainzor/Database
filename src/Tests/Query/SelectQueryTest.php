@@ -46,9 +46,7 @@ class SelectQueryTest extends \PHPUnit_Framework_Testcase
 	{
 		$query = new SelectQuery();
 		$query->from("datacenters");
-		$query->orderBy([
-			"displayName" => SelectQuery::SORT_ASC
-		]);
+		$query->orderBy("displayName")->asc();
 		
 		$this->assertCount(1, $query->orderings());
 	}

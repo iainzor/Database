@@ -16,6 +16,9 @@ abstract class AbstractTable
 	 */
 	private $alias;
 	
+	/**
+	 * @var Column[]
+	 */
 	private $columns = [];
 
 	abstract public function defaultName();
@@ -52,8 +55,18 @@ abstract class AbstractTable
 		return isset($this->alias) ? $this->alias : $this->name();
 	}
 
+	/**
+	 * Get a column from the table
+	 * If the column requested doesn't exist, it will be created and added to the table's columns
+	 * 
+	 * @param string $name
+	 * @return Column
+	 */
 	public function column($name)
 	{
-		return $name;
+		if (!isset($this->columns[$name])) {
+			$this->columns[$name] = new Column($name, $this);
+		}
+		return $this->columns[$name];
 	}
 }

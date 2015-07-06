@@ -2,7 +2,7 @@
 namespace Database\Query;
 
 use Database\PDO,
-	Database\Table\AbstractTable;
+	Database\Table\Column;
 
 class WhereExpr
 {
@@ -41,6 +41,14 @@ class WhereExpr
 		return $this->expr;
 	}
 	
+	/**
+	 * Process an expression made of array parts
+	 * 
+	 * @param array $parts
+	 * @param PDO $db
+	 * @return array
+	 * @throws \Exception
+	 */
 	private function _processArray(array $parts, PDO $db)
 	{
 		if (count($parts) < 2) {
@@ -48,14 +56,18 @@ class WhereExpr
 		}
 		
 		$column = $this->_columnName($this->expr[0]);
-		$operator = isset($this->expr[2]) ? $this->expr[1] : "=";
-		$value = isset($this->expr[2]) ? $this->expr[2] : $this->expr[1];
-
-		if (substr($value, 0, 1) !== ":") {
-			$value = $db->quote($value);
+		$operator = $this->expr[1];
+		$result = [$column, $operator];
+		
+		if (isset($this->expr[2])) {
+			$value = $this->expr[2];
+			if (substr($value, 0, 1) !== ":") {
+				$value = $db->quote($value);
+			}
+			$result[] = $value;
 		}
 
-		return implode(" ", [$column, $operator, $value]);
+		return implode(" ", $result);
 	}
 	
 	/**
@@ -63,12 +75,16 @@ class WhereExpr
 	 * If $str = "mytable.foo" then the method will return "`mytable`.`foo`"
 	 * If no table is specified, the table from the query provided to the constructor will be used
 	 * 
-	 * @param string $str
+	 * @param string|Column $column
 	 * @return string
 	 */
-	private function _columnName($str)
+	private function _columnName($column)
 	{
-		if (preg_match("/^`?([^`]+)`?\.?`?([^`]+)?`?$/", $str, $matches)) {
+		if ($column instanceof Column) {
+			$tableName = $column->table() ? $column->table()->alias() : $this->query->table()->alias();
+			$columnName = $column->name();
+			return "`". $tableName ."`.`". $columnName ."`";
+		} else if (preg_match("/^`?([^`]+)`?\.?`?([^`]+)?`?$/", $column, $matches)) {
 			if (empty($matches[2])) {
 				$columnName = $matches[1];
 				$tableName = $this->query->table()->alias();
@@ -77,9 +93,9 @@ class WhereExpr
 				$columnName = $matches[2];
 			}
 			
-			$str = "`{$tableName}`.`{$columnName}`";
+			return "`{$tableName}`.`{$columnName}`";
 		}
 		
-		return $str;
+		return $column;
 	}
 }

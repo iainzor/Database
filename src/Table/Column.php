@@ -4,6 +4,11 @@ namespace Database\Table;
 class Column
 {
 	/**
+	 * @var AbstractTable
+	 */
+	private $table;
+	
+	/**
 	 * @var string
 	 */
 	private $name;
@@ -42,10 +47,12 @@ class Column
 	 * Constructor
 	 * 
 	 * @param string $name
+	 * @param AbstractTable $table The table the column belongs to
 	 */
-	public function __construct($name = null)
+	public function __construct($name = null, AbstractTable $table = null)
 	{
 		$this->name($name);
+		$this->table($table);
 	}
 	
 	/**
@@ -60,6 +67,20 @@ class Column
 			$this->name = $name;
 		}
 		return $this->name;
+	}
+	
+	/**
+	 * Get or set the table the column belongs to
+	 * 
+	 * @param AbstractTable $table
+	 * @return AbstractTable
+	 */
+	public function table(AbstractTable $table = null)
+	{
+		if ($table !== null) {
+			$this->table = $table;
+		}
+		return $this->table;
 	}
 	
 	/**

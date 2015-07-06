@@ -37,7 +37,8 @@ class SqlGenerator implements SqlGeneratorInterface
 			$this->columnList($query),
 			"FROM `{$table->name()}` AS `{$table->alias()}`",
 			$this->joinClause($query),
-			$this->whereClause($query->whereGroups(), $query->db())
+			$this->whereClause($query->whereGroups(), $query->db()),
+			$this->orderClause($query->orderings())
 		];
 			
 		$sql = implode("\n", $parts);
@@ -114,6 +115,35 @@ class SqlGenerator implements SqlGeneratorInterface
 		}
 		
 		return implode("\n", $lines);
+	}
+	
+	/**
+	 * Generate an order clause for a collection of order expressions
+	 * 
+	 * @param Query\OrderExpr[] $orderings
+	 * @return string
+	 */
+	private function orderClause(array $orderings)
+	{
+		$parts = [];
+		foreach ($orderings as $expr) {
+			$column = $expr->column();
+			$table = $column->table();
+			
+			switch ($expr->direction()) {
+				case Query\QueryInterface::SORT_DESC:
+					$dir = "DESC";
+					break;
+				case Query\QueryInterface::SORT_ASC:
+				default:
+					$dir = "ASC";
+					break;
+			}
+			
+			$parts[] = sprintf("`%s`.`%s` %s", $table->alias(), $column->name(), $dir);
+		}
+		
+		return count($parts) ? "ORDER BY ". implode(", ", $parts) : null;
 	}
 	
 	/**

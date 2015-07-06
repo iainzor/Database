@@ -14,8 +14,9 @@ class SqlGeneratorTest extends \PHPUnit_Framework_TestCase
 		$expected = "SELECT * FROM `players` AS `players` "
 				  . "JOIN `servers` AS `servers` ON `players`.`serverId` = `servers`.`id` "
 				  . "LEFT JOIN `suspensions` AS `suspensions` ON `players`.`id` = `suspensions`.`playerId` "
-				  . "WHERE (id > :maxId AND name LIKE :name) OR (role = 'admin') "
-				  . "ORDER BY `players`.`name` ASC";
+				  . "WHERE (`players`.`id` > :maxId AND `players`.`name` LIKE :name AND `servers`.`id` IS NOT NULL) OR (`players`.`role` = 'admin') "
+				  //. "GROUP BY `servers`.`id` "
+				  . "ORDER BY `servers`.`name` ASC, `players`.`name` DESC";
 		
 		$this->assertEquals($expected, $cleaned);
 	}
