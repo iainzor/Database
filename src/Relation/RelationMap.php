@@ -1,14 +1,15 @@
 <?php
 namespace Database\Relation;
 
-use Database\Table\AbstractTable;
+use Database\PDO,
+	Database\Table\AbstractTable;
 
 class RelationMap
 {
 	/**
-	 * @var \Database\Table\AbstractTable
+	 * @var PDO
 	 */
-	private $table;
+	private $db;
 	
 	/**
 	 * @var AbstractRelation[]
@@ -18,25 +19,11 @@ class RelationMap
 	/**
 	 * Constructor
 	 * 
-	 * @param AbstractTable $table
+	 * @param PDO $db
 	 */
-	public function __construct(AbstractTable $table)
+	public function __construct(PDO $db)
 	{
-		$this->table($table);
-	}
-	
-	/**
-	 * Get or set the base table
-	 * 
-	 * @param AbstractTable $table
-	 * @return AbstractTable
-	 */
-	public function table(AbstractTable $table = null)
-	{
-		if ($table !== null) {
-			$this->table = $table;
-		}
-		return $this->table;
+		$this->db = $db;
 	}
 	
 	/**
@@ -49,7 +36,7 @@ class RelationMap
 	 */
 	public function hasOne($name, AbstractTable $table, $localKeys, $foreignKeys)
 	{
-		$relation = new OneToOneRelation($table, $localKeys, $foreignKeys);
+		$relation = new OneToOneRelation($this->db, $table, $localKeys, $foreignKeys);
 		
 		$this->relations[$name] = $relation;
 	}
@@ -64,7 +51,7 @@ class RelationMap
 	 */
 	public function hasMany($name, AbstractTable $table, $localKeys, $foreignKeys)
 	{
-		$relation =  new OneToManyRelation($table, $localKeys, $foreignKeys);
+		$relation =  new OneToManyRelation($this->db, $table, $localKeys, $foreignKeys);
 		
 		$this->relations[$name] = $relation;
 	}
@@ -77,5 +64,20 @@ class RelationMap
 	public function relations()
 	{
 		return $this->relations;
+	}
+	
+	/**
+	 * Apply all relations to a single result row
+	 * 
+	 * @param array $row
+	 * @return array
+	 */
+	public function applyToRow(array $row)
+	{
+		foreach ($this->relations as $name => $relation) {
+			$row[$name] = $relation->find($row);
+		}
+		
+		return $row;
 	}
 }

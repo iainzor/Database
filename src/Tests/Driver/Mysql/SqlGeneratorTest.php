@@ -19,8 +19,6 @@ class SqlGeneratorTest extends \PHPUnit_Framework_TestCase
 				  . "ORDER BY `servers`.`name` ASC, `players`.`name` DESC "
 				  . "LIMIT 100 OFFSET 50";
 		
-		echo $expected;
-		
 		$this->assertEquals($expected, $cleaned);
 	}
 }
