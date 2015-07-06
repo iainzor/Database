@@ -1,31 +1,32 @@
 <?php
 namespace Database\Query\Traits;
 
+use Database\Query\GroupExpr,
+	Database\Table\Column;
+
 trait GroupByTrait
 {
 	/**
-	 * @var array
+	 * @var GroupExpr[]
 	 */
 	private $groupings = [];
 	
 	/**
-	 * Add one or more columns to group by
+	 * Add a column to group results by
 	 * 
-	 * @param string $columns
+	 * @param string|Column $column
 	 */
-	public function groupBy($columns)
+	public function groupBy($column)
 	{
-		if (!is_array($columns)) {
-			$columns = [$columns];
-		}
-		
-		$this->groupings += $columns;
+		$expr = new GroupExpr($this, $column);
+		$key = $expr->column()->table()->name() .".". $expr->column()->name();
+		$this->groupings[$key] = $expr;
 	}
 	
 	/**
 	 * Get all available groupings for the query
 	 * 
-	 * @return array
+	 * @return GroupExpr[]
 	 */
 	public function groupings()
 	{

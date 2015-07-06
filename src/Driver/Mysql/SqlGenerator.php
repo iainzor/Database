@@ -38,7 +38,9 @@ class SqlGenerator implements SqlGeneratorInterface
 			"FROM `{$table->name()}` AS `{$table->alias()}`",
 			$this->joinClause($query),
 			$this->whereClause($query->whereGroups(), $query->db()),
-			$this->orderClause($query->orderings())
+			$this->groupClause($query->groupings()),
+			$this->orderClause($query->orderings()),
+			$this->limitClause($query->maxResults(), $query->resultOffset())
 		];
 			
 		$sql = implode("\n", $parts);
@@ -118,6 +120,24 @@ class SqlGenerator implements SqlGeneratorInterface
 	}
 	
 	/**
+	 * Generate a GROUP BY clause for a collection of GroupExpr instances
+	 * 
+	 * @param Query\GroupExpr[] $groupings
+	 * @return string
+	 */
+	private function groupClause(array $groupings)
+	{
+		$parts = [];
+		foreach ($groupings as $expr) {
+			$column = $expr->column();
+			$table = $column->table();
+			$parts[] = sprintf("`%s`.`%s`", $table->alias(), $column->name());
+		}
+		
+		return count($parts) ? "GROUP BY ". implode(", ", $parts) : null;
+	}
+	
+	/**
 	 * Generate an order clause for a collection of order expressions
 	 * 
 	 * @param Query\OrderExpr[] $orderings
@@ -144,6 +164,26 @@ class SqlGenerator implements SqlGeneratorInterface
 		}
 		
 		return count($parts) ? "ORDER BY ". implode(", ", $parts) : null;
+	}
+	
+	/**
+	 * Generate a LIMIT clause 
+	 * 
+	 * @param int $maxResults
+	 * @param int $resultOffset
+	 * @return string
+	 */
+	private function limitClause($maxResults, $resultOffset)
+	{
+		if ($maxResults < 1) {
+			return null;
+		}
+		
+		$clause = "LIMIT ". $maxResults;
+		if ($resultOffset > 0) {
+			$clause .= " OFFSET ". $resultOffset;
+		}
+		return $clause;
 	}
 	
 	/**

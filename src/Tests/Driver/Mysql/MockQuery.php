@@ -24,8 +24,10 @@ class MockQuery
 		$query->orWhere([
 			"role" => "admin"
 		]);
+		$query->groupBy($servers->column("id"));
 		$query->orderBy($servers->column("name"))->asc();
 		$query->orderBy("name")->desc();
+		$query->limit(100, 50);
 		
 		return $query;
 	}
