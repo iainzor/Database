@@ -4,59 +4,53 @@ namespace Database\Tests\Relation;
 use Database\Table\GenericTable,
 	Database\Query,
 	Database\Relation\RelationMap,
+	Database\Reference\TableReference,
+	Database\Reference\QueryReference,
 	Database\Tests\TestDb;
 
 class RelationTest extends \PHPUnit_Framework_TestCase
 {
-	public function testHasOne()
+	public function testGenerateMap()
 	{
-		$db = TestDb::pdo();
-		$servers = new GenericTable("servers");
-		
-		$map = new RelationMap($db);
-		$map->hasOne("server", $servers, "serverId", "id");
-		
-		$this->assertCount(1, $map->relations());
-	}
-	
-	public function testApplyToRow()
-	{
-		$playersTable = new GenericTable("players");
-		$serversTable = new GenericTable("servers");
-		$gamesTable = new GenericTable("games");
-		
-		$db = TestDb::pdo();
-		$query = new Query\SelectQuery($db);
-		$query->from($serversTable);
-		$query->where([
-			"id" => 1
+		$contactsQuery = new Query\SelectQuery(TestDb::pdo());
+		$usersMap = RelationMap::generate([
+			"hasOne" => [
+				"client" => [
+					"reference" => new TableReference("clients", TestDb::pdo()),
+					"localKeys" => "clientId",
+					"foreignKeys" => "id",
+					"relationMap" => [
+						"hasMany" => [
+							"contacts" => [
+								"reference" => new QueryReference($contactsQuery),
+								"localKeys" => "id",
+								"foreignKeys" => "resourceId"
+							]
+						]
+					]
+				]
+			]
 		]);
 		
-		$map = new RelationMap($db);
-		$map->hasMany("players", $playersTable, "id", "serverId");
-		$map->hasOne("game", $gamesTable, "gameId", "id");
+		$clientRelation = $usersMap->relation("client");
 		
-		$server = $map->applyToRow(
-			$query->fetchRow()
-		);
-		
-		$this->assertCount(2, $server["players"]);
-		$this->assertNotNull($server["game"]);
+		$this->assertInstanceOf("\\Database\\Relation\\OneToOneRelation", $clientRelation);
+		$this->assertNotNull($clientRelation->relation("contacts"));
 	}
 	
-	public function testApplyToRowset()
+	public function testHasOneForMultipleItems()
 	{
-		$playersTable = new GenericTable("players");
-		$serversTable = new GenericTable("servers");
 		$db = TestDb::pdo();
+		$playersQuery = new Query\SelectQuery($db);
+		$playersQuery->from("players");
 		
-		$query = new Query\SelectQuery($db);
-		$query->from($playersTable);
+		$playersMap = new RelationMap();
+		$playersMap->hasOne("server", new TableReference("servers", $db), "serverId", "id");
 		
-		$players = $query->fetchAll();
-		$map = new RelationMap($db);
-		$map->hasOne("server", $serversTable, "serverId", "id");
+		$players = $playersQuery->fetchAll();
+		$mapped = $playersMap->applyToRowset($players);
 		
-		$mapped = $map->applyToRowset($players);
+		$this->assertNotEmpty($mapped);
+		$this->assertNotNull($mapped[0]["server"]);
 	}
 }

@@ -7,11 +7,6 @@ use Database\Query\QueryInterface,
 class WhereGroup
 {
 	/**
-	 * @var AbstractQuery
-	 */
-	private $query;
-	
-	/**
 	 * @var array
 	 */
 	private $exprs = [];
@@ -29,14 +24,12 @@ class WhereGroup
 	/**
 	 * Constructor
 	 * 
-	 * @param AbstractQuery $query
 	 * @param array $exprs
 	 * @param int $compare
 	 * @param int $linkCompare
 	 */
-	public function __construct(AbstractQuery $query, array $exprs, $compare = QueryInterface::COMPARE_AND, $linkCompare = QueryInterface::COMPARE_AND)
+	public function __construct(array $exprs, $compare = QueryInterface::COMPARE_AND, $linkCompare = QueryInterface::COMPARE_AND)
 	{
-		$this->query = $query;
 		$this->compare = $compare;
 		$this->linkCompare = $linkCompare;
 		
@@ -59,10 +52,10 @@ class WhereGroup
 			foreach ($exprs as $key => $expr) {
 				if (!($expr instanceof WhereExpr)) {
 					if (!is_numeric($key)) {
-						$expr = [$key, "=", $expr];
+						$expr = [$key, QueryInterface::OP_EQUAL_TO, $expr];
 					}
 					
-					$expr = new WhereExpr($this->query, $expr);
+					$expr = new WhereExpr($expr);
 				}
 				$this->exprs[] = $expr;
 			}

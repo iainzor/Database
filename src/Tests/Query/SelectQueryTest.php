@@ -1,13 +1,14 @@
 <?php
 namespace Database\Tests\Query;
 
-use Database\Query\SelectQuery;
+use Database\Query\SelectQuery,
+	Database\Tests\TestDb;
 
 class SelectQueryTest extends \PHPUnit_Framework_Testcase
 {
 	public function testInitialConditions()
 	{
-		$query = new SelectQuery();
+		$query = new SelectQuery(TestDb::pdo());
 		$query->from("datacenters");
 		
 		$this->assertEquals("datacenters", $query->table()->name());
@@ -15,7 +16,7 @@ class SelectQueryTest extends \PHPUnit_Framework_Testcase
 	
 	public function testFromWithArray()
 	{
-		$query = new SelectQuery();
+		$query = new SelectQuery(TestDb::pdo());
 		$query->from(["datacenters", "datacenter"]);
 		
 		$this->assertEquals("datacenters", $query->table()->name());
@@ -24,7 +25,7 @@ class SelectQueryTest extends \PHPUnit_Framework_Testcase
 	
 	public function testWhere()
 	{
-		$query = new SelectQuery();
+		$query = new SelectQuery(TestDb::pdo());
 		$query->from("datacenters");
 		$query->where([
 			"id" => 1
@@ -35,7 +36,7 @@ class SelectQueryTest extends \PHPUnit_Framework_Testcase
 	
 	public function testGroupBy()
 	{
-		$query = new SelectQuery();
+		$query = new SelectQuery(TestDb::pdo());
 		$query->from("datacenters");
 		$query->groupBy("name");
 		
@@ -44,7 +45,7 @@ class SelectQueryTest extends \PHPUnit_Framework_Testcase
 	
 	public function testOrderBy()
 	{
-		$query = new SelectQuery();
+		$query = new SelectQuery(TestDb::pdo());
 		$query->from("datacenters");
 		$query->orderBy("displayName")->asc();
 		
@@ -53,7 +54,7 @@ class SelectQueryTest extends \PHPUnit_Framework_Testcase
 	
 	public function testLimit()
 	{
-		$query = new SelectQuery();
+		$query = new SelectQuery(TestDb::pdo());
 		$query->from("datacenters");
 		$query->limit(1);
 		
@@ -63,7 +64,7 @@ class SelectQueryTest extends \PHPUnit_Framework_Testcase
 	
 	public function testMatchingTables()
 	{
-		$query = new SelectQuery();
+		$query = new SelectQuery(TestDb::pdo());
 		$query->from("users");
 		$joinExpr = $query->join("roles", "id")->on("users", "roleId");
 		

@@ -21,7 +21,7 @@ abstract class AbstractQuery implements QueryInterface
 	 * 
 	 * @param PDO $db
 	 */
-	public function __construct(PDO $db = null)
+	public function __construct(PDO $db)
 	{
 		$this->db($db);
 	}
@@ -34,7 +34,7 @@ abstract class AbstractQuery implements QueryInterface
 	 */
 	public function db(PDO $db = null)
 	{
-		if ($db !== null) {
+		if ($db) {
 			$this->db = $db;
 		}
 		return $this->db;
@@ -61,6 +61,10 @@ abstract class AbstractQuery implements QueryInterface
 				$this->table->alias($tableAlias);
 			} else {
 				throw new \InvalidArgumentException("Could not create table instance from passed value");
+			}
+			
+			if (!$this->table->db()) {
+				$this->table->db($this->db());
 			}
 		}
 		

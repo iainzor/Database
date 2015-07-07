@@ -1,11 +1,15 @@
 <?php
 namespace Database\Table;
 
+use Database\PDO;
+
 abstract class AbstractTable
 {
-	private static $dbModule;
+	/**
+	 * @var PDO
+	 */
 	private $db;
-
+	
 	/**
 	 * @var string
 	 */
@@ -21,8 +25,24 @@ abstract class AbstractTable
 	 */
 	private $columns = [];
 
+	/**
+	 * @return string
+	 */
 	abstract public function defaultName();
-	abstract public function connectionId();
+	
+	/**
+	 * Get or set the PDO instance for the table
+	 * 
+	 * @param PDO $db
+	 * @return PDO
+	 */
+	public function db(PDO $db = null)
+	{
+		if ($db !== null) {
+			$this->db = $db;
+		}
+		return $this->db;
+	}
 	
 	/**
 	 * Get or set the name of the table

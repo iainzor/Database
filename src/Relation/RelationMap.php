@@ -1,42 +1,63 @@
 <?php
 namespace Database\Relation;
 
-use Database\PDO,
-	Database\Table\AbstractTable;
+use Database\Reference\ReferenceInterface;
 
 class RelationMap
 {
-	/**
-	 * @var PDO
-	 */
-	private $db;
-	
 	/**
 	 * @var AbstractRelation[]
 	 */
 	private $relations = [];
 	
 	/**
-	 * Constructor
+	 * Generate a new RelationMap from a set of relation configurations
 	 * 
-	 * @param PDO $db
+	 * @param array $relations
+	 * @return RelationMap
 	 */
-	public function __construct(PDO $db)
+	public static function generate(array $relations)
 	{
-		$this->db = $db;
+		$instance = new self();
+		foreach ($relations as $type => $items) {
+			foreach ($items as $name => $config) {
+				$instance->relation($name, self::_generate($type, $config));
+			}
+		}
+		return $instance;
+	}
+	
+	/**
+	 * Generate a new relation 
+	 * 
+	 * @param string $type
+	 * @param array $config
+	 * @return AbstractRelation
+	 * @throws \UnexpectedValueException
+	 */
+	private static function _generate($type, array $config)
+	{
+		switch (strtolower($type)) {
+			case "hasone":
+				return OneToOneRelation::generate($config);
+			case "hasmany":
+				return OneToManyRelation::generate($config);
+			default:
+				throw new \UnexpectedValueException("Unknown relation type: {$type}");
+		}
 	}
 	
 	/**
 	 * Create a new one-to-one relationship
 	 * 
 	 * @param string $name
-	 * @param AbstractTable $table
+	 * @param ReferenceInterface $reference
 	 * @param string|array $localKeys
 	 * @param string|array $foreignKeys
 	 */
-	public function hasOne($name, AbstractTable $table, $localKeys, $foreignKeys)
+	public function hasOne($name, ReferenceInterface $reference, $localKeys, $foreignKeys)
 	{
-		$relation = new OneToOneRelation($this->db, $table, $localKeys, $foreignKeys);
+		$relation = new OneToOneRelation($reference, $localKeys, $foreignKeys);
 		
 		$this->relations[$name] = $relation;
 	}
@@ -45,13 +66,13 @@ class RelationMap
 	 * Create a new one-to-many relationship
 	 * 
 	 * @param string $name
-	 * @param AbstractTable $table
+	 * @param ReferenceInterface $reference
 	 * @param string|array $localKeys
 	 * @param string|array $foreignKeys
 	 */
-	public function hasMany($name, AbstractTable $table, $localKeys, $foreignKeys)
+	public function hasMany($name, ReferenceInterface $reference, $localKeys, $foreignKeys)
 	{
-		$relation =  new OneToManyRelation($this->db, $table, $localKeys, $foreignKeys);
+		$relation =  new OneToManyRelation($reference, $localKeys, $foreignKeys);
 		
 		$this->relations[$name] = $relation;
 	}
@@ -67,17 +88,33 @@ class RelationMap
 	}
 	
 	/**
-	 * Apply all relations to a single result row
+	 * Get a relation by its name
 	 * 
-	 * @param array $row
-	 * @return array
+	 * @param string $name
+	 * @return AbstractRelation
+	 * @throws \Exception
 	 */
-	public function applyToRow(array $row)
+	public function relation($name, AbstractRelation $relation = null)
 	{
-		foreach ($this->relations as $name => $relation) {
-			$row[$name] = $relation->find($row);
+		if ($relation !== null) {
+			$this->relations[$name] = $relation;
 		}
 		
-		return $row;
+		if (!isset($this->relations[$name])) {
+			throw new \Exception("Relation by the name of '{$name}' could not be found");
+		}
+		
+		return $this->relations[$name];
+	}
+	
+	public function applyToRowset(array $rows)
+	{
+		foreach ($this->relations as $name => $relation) {
+			$results = $relation->findAll($rows);
+			
+			$relation->assignResults($results, $rows);
+		}
+		
+		return $rows;
 	}
 }

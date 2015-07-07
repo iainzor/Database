@@ -59,6 +59,12 @@ class SqlGenerator implements SqlGeneratorInterface
 		foreach ($whereGroups as $i => $whereGroup) {
 			$group = [];
 			foreach ($whereGroup->exprs() as $expr) {
+				$column = $expr->column();
+				$operator = $expr->operator();
+				$value = $expr->value();
+				
+				
+				
 				$group[] = $expr->toString($db);
 			}
 			

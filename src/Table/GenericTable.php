@@ -1,26 +1,26 @@
 <?php
 namespace Database\Table;
 
-use Database\Config;
+use Database\PDO;
 
 class GenericTable extends AbstractTable 
 {
-	private $_connectionId;
 	private $_name;
 	
 	/**
 	 * Constructor
 	 * 
 	 * @param string $name
-	 * @param string $connectionId
+	 * @param PDO $db
 	 */
-	public function __construct($name, $connectionId = Config::DEFAULT_CONNECTION)
+	public function __construct($name, PDO $db = null)
 	{	
 		$this->_name = $name;
-		$this->_connectionId = $connectionId;
+		$this->db($db);
 	}
 	
-	public function connectionId() { return $this->_connectionId; }
-
+	/**
+	 * @return string
+	 */
 	public function defaultName() { return $this->_name; }
 }

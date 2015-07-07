@@ -11,11 +11,13 @@ class SelectQuery extends AbstractQuery
 	 * Set the table to select from
 	 * 
 	 * @param mixed $table
+	 * @param PDO $db Optional PDO instance for the table
 	 * @see AbstractQuery::table()
 	 */
-	public function from($table)
+	public function from($table, PDO $db = null)
 	{
-		$this->table($table);
+		$instance = $this->table($table);
+		$instance->db($db);
 	}
 	
 	/**
@@ -27,6 +29,10 @@ class SelectQuery extends AbstractQuery
 	 */
 	public function fetchAll(array $params = [], $fetchStyle = PDO::FETCH_ASSOC)
 	{
+		if (!$this->db()) {
+			throw new \Exception("No database instance has been given to the query");
+		}
+		
 		$driverFactory = $this->db()->driverFactory();
 		$sql = $driverFactory->sqlGenerator()->generate($this);
 		

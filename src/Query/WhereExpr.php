@@ -19,12 +19,10 @@ class WhereExpr
 	/**
 	 * Constructor
 	 * 
-	 * @param AbstractQuery $query
 	 * @param mixed $expr
 	 */
-	public function __construct(AbstractQuery $query, $expr)
+	public function __construct($expr)
 	{
-		$this->query = $query;
 		$this->expr = $expr;
 	}
 	
@@ -84,7 +82,7 @@ class WhereExpr
 			$tableName = $column->table() ? $column->table()->alias() : $this->query->table()->alias();
 			$columnName = $column->name();
 			return "`". $tableName ."`.`". $columnName ."`";
-		} else if (preg_match("/^`?([^`]+)`?\.?`?([^`]+)?`?$/", $column, $matches)) {
+		} else if (preg_match("/^`?([a-z0-9-_]+)`?\.?`?([a-z0-9-_]+)?`?$/i", $column, $matches)) {
 			if (empty($matches[2])) {
 				$columnName = $matches[1];
 				$tableName = $this->query->table()->alias();
