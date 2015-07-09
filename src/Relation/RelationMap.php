@@ -54,12 +54,15 @@ class RelationMap
 	 * @param ReferenceInterface $reference
 	 * @param string|array $localKeys
 	 * @param string|array $foreignKeys
+	 * @return OneToOneRelation
 	 */
 	public function hasOne($name, ReferenceInterface $reference, $localKeys, $foreignKeys)
 	{
 		$relation = new OneToOneRelation($reference, $localKeys, $foreignKeys);
 		
 		$this->relations[$name] = $relation;
+		
+		return $relation;
 	}
 	
 	/**
@@ -69,12 +72,15 @@ class RelationMap
 	 * @param ReferenceInterface $reference
 	 * @param string|array $localKeys
 	 * @param string|array $foreignKeys
+	 * @return OneToOneRelation
 	 */
 	public function hasMany($name, ReferenceInterface $reference, $localKeys, $foreignKeys)
 	{
 		$relation =  new OneToManyRelation($reference, $localKeys, $foreignKeys);
 		
 		$this->relations[$name] = $relation;
+		
+		return $relation;
 	}
 	
 	/**
@@ -107,12 +113,18 @@ class RelationMap
 		return $this->relations[$name];
 	}
 	
+	/**
+	 * Apply the relation map to a set of rows
+	 * 
+	 * @param array $rows
+	 * @return array
+	 */
 	public function applyToRowset(array $rows)
 	{
 		foreach ($this->relations as $name => $relation) {
 			$results = $relation->findAll($rows);
 			
-			$relation->assignResults($results, $rows);
+			$relation->assignResults($name, $results, $rows);
 		}
 		
 		return $rows;

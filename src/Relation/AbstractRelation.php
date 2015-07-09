@@ -100,6 +100,12 @@ abstract class AbstractRelation
 		return $instance;
 	}
 	
+	/**
+	 * Find all related items matching a set of rows
+	 * 
+	 * @param array $rows
+	 * @return array
+	 */
 	public function findAll(array $rows)
 	{
 		$params = [];
@@ -120,4 +126,32 @@ abstract class AbstractRelation
 		
 		return [];
 	}
+	
+	/**
+	 * Check if a local and foreign row match based on the relation's local and foreign keys
+	 * 
+	 * @param array $localRow
+	 * @param array $foreignRow
+	 * @return boolean
+	 */
+	protected function rowsMatch(array $localRow, array $foreignRow)
+	{
+		$matched = 0;
+		foreach ($this->localKeys as $i => $localKey) {
+			$foreignKey = $this->foreignKeys[$i];
+			
+			if (isset($localRow[$localKey], $foreignRow[$foreignKey])) {
+				$localValue = $localRow[$localKey];
+				$foreignValue = $foreignRow[$foreignKey];
+				
+				if ($localValue === $foreignValue) {
+					$matched++; 
+				}
+			}
+		}
+		
+		return $matched === count($this->localKeys);
+	}
+	
+	abstract public function assignResults($assignAs, array $foreignRows, array &$localRows);
 }

@@ -45,12 +45,18 @@ class RelationTest extends \PHPUnit_Framework_TestCase
 		$playersQuery->from("players");
 		
 		$playersMap = new RelationMap();
-		$playersMap->hasOne("server", new TableReference("servers", $db), "serverId", "id");
+		$serverRelation = $playersMap->hasOne("server", new TableReference("servers", $db), "serverId", "id");
+		$serverRelation->relationMap()->hasOne("game", new TableReference("games", $db), "gameId", "id");
 		
 		$players = $playersQuery->fetchAll();
 		$mapped = $playersMap->applyToRowset($players);
 		
 		$this->assertNotEmpty($mapped);
-		$this->assertNotNull($mapped[0]["server"]);
+		
+		foreach ($mapped as $player) {
+			$this->assertNotNull($player["server"]);
+			$this->assertEquals($player["serverId"], $player["server"]["id"]);
+			$this->assertNotNull($player["server"]["game"]);
+		}
 	}
 }

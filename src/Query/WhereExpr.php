@@ -6,15 +6,33 @@ use Database\PDO,
 
 class WhereExpr
 {
-	/**
-	 * @var AbstractQuery
-	 */
-	private $query;
+	const TYPE_STRING = 1;
+	const TYPE_COMPOUND = 2;
 	
 	/**
 	 * @var mixed
 	 */
 	private $expr;
+	
+	/**
+	 * @var int
+	 */
+	private $type;
+	
+	/**
+	 * @var string
+	 */
+	private $column;
+	
+	/**
+	 * @var mixed
+	 */
+	private $operator;
+	
+	/**
+	 * @var mixed
+	 */
+	private $value;
 	
 	/**
 	 * Constructor
@@ -24,76 +42,87 @@ class WhereExpr
 	public function __construct($expr)
 	{
 		$this->expr = $expr;
+		
+		if (is_string($expr)) {
+			$this->type = self::TYPE_STRING;
+		} else if (is_array($expr)) {
+			$this->type = self::TYPE_COMPOUND;
+			$this->parseCompound($expr);
+		}
 	}
 	
 	/**
-	 * @param \Database\PDO
-	 * @return string
+	 * Parse a compound expression
+	 * 
+	 * @param array $expr
 	 */
-	public function toString(PDO $db)
+	private function parseCompound(array $expr)
 	{
-		if (is_array($this->expr)) {
-			return $this->_processArray($this->expr, $db);
-		}
+		$values = array_values($expr);
 		
+		$this->column = $values[0];
+		$this->operator = isset($values[1]) ? $values[1] : null;
+		$this->value = isset($values[2]) ? $values[2] : null;
+	}
+	
+	/**
+	 * Check if the expression is a string
+	 * 
+	 * @return boolean
+	 */
+	public function isString()
+	{
+		return $this->type === self::TYPE_STRING;
+	}
+	
+	/**
+	 * Check if the expression is a compound expression
+	 * Compound expressions are multi-part arrays
+	 * 
+	 * @return boolean
+	 */
+	public function isCompound()
+	{
+		return $this->type === self::TYPE_COMPOUND;
+	}
+	
+	/**
+	 * Get the original expression
+	 * 
+	 * @return mixed
+	 */
+	public function expr()
+	{
 		return $this->expr;
 	}
 	
 	/**
-	 * Process an expression made of array parts
+	 * Get the column used in the compound expression
 	 * 
-	 * @param array $parts
-	 * @param PDO $db
-	 * @return array
-	 * @throws \Exception
+	 * @return string
 	 */
-	private function _processArray(array $parts, PDO $db)
+	public function column()
 	{
-		if (count($parts) < 2) {
-			throw new \Exception("Can't build WHERE expression with less than 2 parts: ". json_encode($parts));
-		}
-		
-		$column = $this->_columnName($this->expr[0]);
-		$operator = $this->expr[1];
-		$result = [$column, $operator];
-		
-		if (isset($this->expr[2])) {
-			$value = $this->expr[2];
-			if (substr($value, 0, 1) !== ":") {
-				$value = $db->quote($value);
-			}
-			$result[] = $value;
-		}
-
-		return implode(" ", $result);
+		return $this->column;
 	}
 	
 	/**
-	 * Generate a fully qualified column name
-	 * If $str = "mytable.foo" then the method will return "`mytable`.`foo`"
-	 * If no table is specified, the table from the query provided to the constructor will be used
+	 * Get the operator of the expression
 	 * 
-	 * @param string|Column $column
-	 * @return string
+	 * @return mixed
 	 */
-	private function _columnName($column)
+	public function operator()
 	{
-		if ($column instanceof Column) {
-			$tableName = $column->table() ? $column->table()->alias() : $this->query->table()->alias();
-			$columnName = $column->name();
-			return "`". $tableName ."`.`". $columnName ."`";
-		} else if (preg_match("/^`?([a-z0-9-_]+)`?\.?`?([a-z0-9-_]+)?`?$/i", $column, $matches)) {
-			if (empty($matches[2])) {
-				$columnName = $matches[1];
-				$tableName = $this->query->table()->alias();
-			} else {
-				$tableName = $matches[1];
-				$columnName = $matches[2];
-			}
-			
-			return "`{$tableName}`.`{$columnName}`";
-		}
-		
-		return $column;
+		return $this->operator;
+	}
+	
+	/**
+	 * Get the value used to compare to the column
+	 * 
+	 * @return mixed
+	 */
+	public function value()
+	{
+		return $this->value;
 	}
 }

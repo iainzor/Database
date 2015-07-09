@@ -34,6 +34,16 @@ class PDO extends \PDO
 	}
 	
 	/**
+	 * Get all database logs
+	 * 
+	 * @return array
+	 */
+	public function logs()
+	{
+		return $this->logs;
+	}
+	
+	/**
 	 * Get the name of the driver being used
 	 * 
 	 * @return string
