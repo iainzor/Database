@@ -102,6 +102,19 @@ abstract class AbstractTable
 	}
 	
 	/**
+	 * Create a new SelectQuery for the table
+	 * 
+	 * @return \Database\Query\SelectQuery
+	 */
+	public function select()
+	{
+		$query = new Query\SelectQuery($this->db());
+		$query->from($this);
+		
+		return $query;
+	}
+	
+	/**
 	 * Find a single record from the table
 	 * 
 	 * @param mixed $where
@@ -110,8 +123,7 @@ abstract class AbstractTable
 	 */
 	public function find($where, array $params = [])
 	{
-		$query = new Query\SelectQuery($this->db());
-		$query->from($this);
+		$query = $this->select();
 		$query->where($where);
 		
 		return $query->fetchRow($params);

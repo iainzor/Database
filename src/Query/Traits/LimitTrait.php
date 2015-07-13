@@ -26,22 +26,28 @@ trait LimitTrait
 	}
 	
 	/**
-	 * Get the maximum number of results the query should be limited to
+	 * Get or set the maximum number of results the query should be limited to
 
 	 * @return int
 	 */
-	public function maxResults()
+	public function maxResults($maxResults = null)
 	{
+		if ($maxResults !== null) {
+			$this->maxResults = (int) $maxResults;
+		}
 		return $this->maxResults;
 	}
 	
 	/**
-	 * Get the number or records to offset the limit by
+	 * Get or set the number or records to offset the limit by
 	 * 
 	 * @return int
 	 */
-	public function resultOffset()
+	public function resultOffset($offset = null)
 	{
+		if ($offset !== null) {
+			$this->resultOffset = (int) $offset;
+		}
 		return $this->resultOffset;
 	}
 }
