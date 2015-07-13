@@ -1,7 +1,8 @@
 <?php
 namespace Database\Table;
 
-use Database\PDO;
+use Database\PDO,
+	Database\Query;
 
 abstract class AbstractTable
 {
@@ -29,6 +30,16 @@ abstract class AbstractTable
 	 * @return string
 	 */
 	abstract public function defaultName();
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param PDO $db
+	 */
+	public function __construct(PDO $db)
+	{
+		$this->db($db);
+	}
 	
 	/**
 	 * Get or set the PDO instance for the table
@@ -88,5 +99,21 @@ abstract class AbstractTable
 			$this->columns[$name] = new Column($name, $this);
 		}
 		return $this->columns[$name];
+	}
+	
+	/**
+	 * Find a single record from the table
+	 * 
+	 * @param mixed $where
+	 * @param array $params
+	 * @return array
+	 */
+	public function find($where, array $params = [])
+	{
+		$query = new Query\SelectQuery($this->db());
+		$query->from($this);
+		$query->where($where);
+		
+		return $query->fetchRow($params);
 	}
 }
