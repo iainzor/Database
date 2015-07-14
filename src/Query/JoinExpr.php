@@ -154,11 +154,11 @@ class JoinExpr
 	private function _createTable($table)
 	{
 		if (is_string($table)) {
-			$table = new GenericTable($table);
+			$table = new GenericTable($table, $this->query->db());
 		} else if (is_array($table)) {
 			$name = array_shift($table);
 			$alias = empty($table) ? $name : array_shift($table);
-			$table = new GenericTable($name);
+			$table = new GenericTable($name, $this->query->db());
 			$table->alias($alias);
 		}
 		

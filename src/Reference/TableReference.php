@@ -21,22 +21,22 @@ class TableReference implements ReferenceInterface
 	 */
 	public function __construct($table, PDO $db = null)
 	{
-		$instance = $this->table($table);
-		$instance->db($db);
+		$this->table($table, $db);
 	}
 	
 	/**
 	 * Get or set the table to reference
 	 * 
 	 * @param string|AbstractTable $table
+	 * @param PDO $db
 	 * @return AbstractTable
 	 * @throws \Exception
 	 */
-	public function table($table = null)
+	public function table($table = null, PDO $db = null)
 	{
 		if ($table !== null) {
 			if (is_string($table)) {
-				$table = new GenericTable($table);
+				$table = new GenericTable($table, $db);
 			}
 			if (!($table instanceof AbstractTable)) {
 				throw new \Exception("Table must be a string or an instance of \\Database\\Table\\AbstractTable");

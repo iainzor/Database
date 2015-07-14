@@ -1,7 +1,9 @@
 <?php
 namespace Database\Tests\Driver\Mysql;
 
-use Database\Driver\Mysql\DriverFactory;
+use Database\Driver\Mysql\DriverFactory,
+	Database\Query,
+	Database\Tests\TestDb;
 
 class SqlGeneratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -10,7 +12,7 @@ class SqlGeneratorTest extends \PHPUnit_Framework_TestCase
 		$factory = new DriverFactory();
 		$query = MockQuery::create();
 		$sql = $factory->sqlGenerator()->generate($query);
-		$cleaned = preg_replace("/\n/", " ", $sql);
+		$cleaned = $this->_clean($sql);
 		$expected = "SELECT * FROM `players` AS `players` "
 				  . "JOIN `servers` AS `servers` ON `players`.`serverId` = `servers`.`id` "
 				  . "LEFT JOIN `suspensions` AS `suspensions` ON `players`.`id` = `suspensions`.`playerId` "
@@ -20,5 +22,41 @@ class SqlGeneratorTest extends \PHPUnit_Framework_TestCase
 				  . "LIMIT 100 OFFSET 50";
 		
 		$this->assertEquals($expected, $cleaned);
+	}
+	
+	public function testCreateInsertStatement()
+	{
+		$factory = new DriverFactory();
+		$db = TestDb::pdo();
+		$query = new Query\InsertQuery($db);
+		$query->into("my_table");
+		$query->rows([
+			[
+				"foo" => "bar",
+				"bar" => "baz"
+			], [
+				"foo" => "baz",
+				"bar" => "foo",
+				"baz" => "blah"
+			]
+		]);
+		$sql = $factory->sqlGenerator()->generate($query);
+		$cleaned = $this->_clean($sql);
+		$expected = "INSERT INTO `my_table` "
+				  . "(`foo`, `bar`, `baz`) VALUES "
+				  . "('bar', 'baz', NULL), ('baz', 'foo', 'blah')";
+		
+		$this->assertEquals($expected, $cleaned);
+	}
+	
+	/**
+	 * Clean a SQL string
+	 * 
+	 * @param string $sql
+	 * @return string
+	 */
+	private function _clean($sql)
+	{
+		return preg_replace("/\n/", " ", $sql);
 	}
 }

@@ -128,4 +128,19 @@ abstract class AbstractTable
 		
 		return $query->fetchRow($params);
 	}
+	
+	/**
+	 * Insert a row into the table and return the new row's primary key
+	 * 
+	 * @param array $row
+	 * @return mixed
+	 */
+	public function insert(array $row)
+	{
+		$query = new Query\InsertQuery($this->db());
+		$query->into($this);
+		$query->addRow($row);
+		
+		return $query->execute();
+	}
 }

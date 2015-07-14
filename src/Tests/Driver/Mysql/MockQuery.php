@@ -9,8 +9,9 @@ class MockQuery
 {
 	public static function create()
 	{
-		$players = new Table\GenericTable("players");
-		$servers = new Table\GenericTable("servers");
+		$db = TestDb::pdo();
+		$players = new Table\GenericTable("players", $db);
+		$servers = new Table\GenericTable("servers", $db);
 		
 		$query = new Query\SelectQuery(TestDb::pdo());
 		$query->from($players);

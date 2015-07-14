@@ -53,11 +53,11 @@ abstract class AbstractQuery implements QueryInterface
 			if ($table instanceof Table\AbstractTable) {
 				$this->table = $table;
 			} else if (is_string($table)) {
-				$this->table = new Table\GenericTable($table);
+				$this->table = new Table\GenericTable($table, $this->db());
 			} else if (is_array($table)) {
 				$tableName = $table[0];
 				$tableAlias = isset($table[1]) ? $table[1] : null;
-				$this->table = new Table\GenericTable($tableName);
+				$this->table = new Table\GenericTable($tableName, $this->db());
 				$this->table->alias($tableAlias);
 			} else {
 				throw new \InvalidArgumentException("Could not create table instance from passed value");
