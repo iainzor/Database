@@ -21,6 +21,12 @@ class InsertSqlGenerator
 		$this->query = $query;
 	}
 	
+	/**
+	 * Generate the INSERT statement
+	 * 
+	 * @return string
+	 * @throws \Exception
+	 */
 	public function generate()
 	{
 		$table = $this->query->table();
@@ -37,7 +43,8 @@ class InsertSqlGenerator
 		$parts = [
 			"INSERT INTO `{$table->name()}`",
 			$this->columnList(),
-			$this->valueList()
+			$this->valueList(),
+			$this->onDuplicateClause()
 		];
 			
 		return implode(" ", $parts);
@@ -104,5 +111,34 @@ class InsertSqlGenerator
 			}
 		}
 		return $columns;
+	}
+	
+	/**
+	 * Generate the ON DUPLICATE KEY clause if the query has columns set to update
+	 * 
+	 * @return string
+	 */
+	private function onDuplicateClause()
+	{
+		$columns = $this->query->updateColumns();
+		$db = $this->query->db();
+		
+		if (count($columns)) {
+			$parts = [];
+			foreach ($columns as $name => $value) {
+				if (is_numeric($name)) {
+					$name = $value;
+					$value = "VALUES(`{$name}`)";
+				} else if ($value === null) {
+					$value = "NULL";
+				} else {
+					$value = $db->quote($value);
+				}
+				$parts[] = "`{$name}` = {$value}";
+			}
+			return "ON DUPLICATE KEY UPDATE ". implode(", ", $parts);
+		}
+		
+		return null;
 	}
 }

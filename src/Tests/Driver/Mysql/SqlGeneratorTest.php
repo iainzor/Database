@@ -40,11 +40,18 @@ class SqlGeneratorTest extends \PHPUnit_Framework_TestCase
 				"baz" => "blah"
 			]
 		]);
+		$query->onDuplicateKeyUpdate([
+			"foo",
+			"bar" => "foo",
+			"baz" => null
+		]);
 		$sql = $factory->sqlGenerator()->generate($query);
 		$cleaned = $this->_clean($sql);
 		$expected = "INSERT INTO `my_table` "
 				  . "(`foo`, `bar`, `baz`) VALUES "
-				  . "('bar', 'baz', NULL), ('baz', 'foo', 'blah')";
+				  . "('bar', 'baz', NULL), ('baz', 'foo', 'blah') "
+				  . "ON DUPLICATE KEY UPDATE "
+				  . "`foo` = VALUES(`foo`), `bar` = 'foo', `baz` = NULL";
 		
 		$this->assertEquals($expected, $cleaned);
 	}

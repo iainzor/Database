@@ -11,6 +11,11 @@ class InsertQuery extends AbstractQuery
 	private $rows = [];
 	
 	/**
+	 * @var array
+	 */
+	private $updateColumns = [];
+	
+	/**
 	 * Set the table to insert into
 	 * 
 	 * @param mixed $table
@@ -52,6 +57,26 @@ class InsertQuery extends AbstractQuery
 			}
 		}
 		return $this->rows;
+	}
+	
+	/**
+	 * Set the columns to update when a duplicate key is found
+	 * 
+	 * @param array $columns
+	 */
+	public function onDuplicateKeyUpdate(array $columns)
+	{
+		$this->updateColumns = $columns;
+	}
+	
+	/**
+	 * Get the columns to update if a duplicate key is found
+	 * 
+	 * @return array
+	 */
+	public function updateColumns()
+	{
+		return $this->updateColumns;
 	}
 	
 	/**
