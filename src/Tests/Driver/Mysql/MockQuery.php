@@ -15,8 +15,12 @@ class MockQuery
 		
 		$query = new Query\SelectQuery(TestDb::pdo());
 		$query->from($players);
+		$query->columns(["*"]);
 		$query->join($servers, "id", "serverId");
-		$query->leftJoin("suspensions", "playerId", "id");
+		$query->leftJoin("suspensions", "playerId", "id", [
+			"id" => "suspensionId",
+			"date"
+		]);
 		$query->where([
 			["id", ">", ":maxId"],
 			["name", "LIKE", ":name"],

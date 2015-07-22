@@ -32,6 +32,11 @@ class JoinExpr
 	private $localKeys = [];
 	
 	/**
+	 * @var array
+	 */
+	private $columns = [];
+	
+	/**
 	 * @var int
 	 */
 	private $type = QueryInterface::JOIN_DEFAULT;
@@ -43,15 +48,17 @@ class JoinExpr
 	 * @param string|array|AbstractTable $foreignTable
 	 * @param string|array $foreignKeys
 	 * @param string|array $localKeys
+	 * @param array $columns
 	 * @param int $type
 	 */
-	public function __construct(AbstractQuery $query, $foreignTable, $foreignKeys, $localKeys = null, $type = QueryInterface::JOIN_DEFAULT) 
+	public function __construct(AbstractQuery $query, $foreignTable, $foreignKeys, $localKeys, array $columns = null, $type = QueryInterface::JOIN_DEFAULT) 
 	{
 		$this->query = $query;
 		
 		$this->foreignTable($foreignTable);
 		$this->foreignKeys($foreignKeys);
 		$this->localKeys($localKeys);
+		$this->columns($columns);
 		$this->type($type);
 	}
 	
@@ -127,6 +134,20 @@ class JoinExpr
 			$this->localKeys = is_array($keys) ? $keys : [$keys];
 		}
 		return $this->localKeys;
+	}
+	
+	/**
+	 * Get or set the columns to be selected from the foreign table
+	 * 
+	 * @param array $columns
+	 * @return array
+	 */
+	public function columns(array $columns = null)
+	{
+		if ($columns !== null) {
+			$this->columns = $columns;
+		}
+		return $this->columns;
 	}
 	
 	/**

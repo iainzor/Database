@@ -1,7 +1,8 @@
 <?php
 namespace Database\Driver\Mysql;
 
-use Database\Query\SelectQuery;
+use Database\Query\SelectQuery,
+	Database\Table\AbstractTable;
 
 class SelectSqlGenerator
 {
@@ -53,7 +54,45 @@ class SelectSqlGenerator
 	 */
 	private function columnList()
 	{
-		return "*";
+		$table = $this->query->table();
+		$joins = $this->query->joins();
+		$fields = [];
+		
+		foreach ($this->query->columns() as $name => $alias) {
+			$fields[] = $this->_columnName($table, $name, $alias);
+		}
+		foreach ($joins as $join) {
+			$foreignTable = $join->foreignTable();
+			foreach ($join->columns() as $name => $alias) {
+				$fields[] = $this->_columnName($foreignTable, $name, $alias);
+			}
+		}
+		
+		return count($fields) ? implode(", ", $fields) : "*";
+	}
+	
+	/**
+	 * Parse a column name for the SQL statement
+	 * 
+	 * @param AbstractTable $table
+	 * @param mixed $name
+	 * @param string $alias
+	 * @return string
+	 */
+	private function _columnName(AbstractTable $table, $name, $alias)
+	{
+		if (is_numeric($name)) {
+			$name = $alias;
+		}
+		
+		$parts = [
+			"`{$table->alias()}`." . (($name === "*") ? "*" : "`{$name}`")
+		];
+		if ($alias !== "*") {
+			$parts[] = "AS `{$alias}`";
+		}
+		
+		return implode(" ", $parts);
 	}
 	
 	/**

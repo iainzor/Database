@@ -13,6 +13,25 @@ class SelectQuery extends AbstractQuery
 		Traits\RelationTrait;
 	
 	/**
+	 * @var array
+	 */
+	private $columns = ["*"];
+	
+	/**
+	 * Get or set the columns to select from the base table
+	 * 
+	 * @param array $columns
+	 * @return array
+	 */
+	public function columns(array $columns = null)
+	{
+		if ($columns !== null) {
+			$this->columns = $columns;
+		}
+		return $this->columns;
+	}
+	
+	/**
 	 * Set the table to select from
 	 * 
 	 * @param mixed $table
