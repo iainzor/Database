@@ -13,9 +13,9 @@ class SqlGeneratorTest extends \PHPUnit_Framework_TestCase
 		$query = MockQuery::create();
 		$sql = $factory->sqlGenerator()->generate($query);
 		$cleaned = $this->_clean($sql);
-		$expected = "SELECT * FROM `players` AS `players` "
-				  . "JOIN `servers` AS `servers` ON `players`.`serverId` = `servers`.`id` "
-				  . "LEFT JOIN `suspensions` AS `suspensions` ON `players`.`id` = `suspensions`.`playerId` "
+		$expected = "SELECT * FROM `bliss_database_tests`.`players` AS `players` "
+				  . "JOIN `bliss_database_tests`.`servers` AS `servers` ON `players`.`serverId` = `servers`.`id` "
+				  . "LEFT JOIN `bliss_database_tests`.`suspensions` AS `suspensions` ON `players`.`id` = `suspensions`.`playerId` "
 				  . "WHERE (`players`.`id` > :maxId AND `players`.`name` LIKE :name AND `servers`.`id` IS NOT NULL) OR (`players`.`role` = 'admin') "
 				  . "GROUP BY `servers`.`id` "
 				  . "ORDER BY `servers`.`name` ASC, `players`.`name` DESC "

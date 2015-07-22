@@ -5,7 +5,12 @@ use Database\PDO;
 
 class SelectQuery extends AbstractQuery
 {
-	use Traits\JoinTrait, Traits\WhereTrait, Traits\GroupByTrait, Traits\OrderByTrait, Traits\LimitTrait;
+	use Traits\JoinTrait, 
+		Traits\WhereTrait, 
+		Traits\GroupByTrait, 
+		Traits\OrderByTrait, 
+		Traits\LimitTrait,
+		Traits\RelationTrait;
 	
 	/**
 	 * Set the table to select from
@@ -35,8 +40,9 @@ class SelectQuery extends AbstractQuery
 		
 		$driverFactory = $this->db()->driverFactory();
 		$sql = $driverFactory->sqlGenerator()->generate($this);
+		$results = $this->db()->fetchAll($sql, $params, $fetchStyle);
 		
-		return $this->db()->fetchAll($sql, $params, $fetchStyle);
+		return $this->relationMap()->applyToRowset($results);
 	}
 	
 	/**
@@ -50,7 +56,12 @@ class SelectQuery extends AbstractQuery
 	{
 		$driverFactory = $this->db()->driverFactory();
 		$sql = $driverFactory->sqlGenerator()->generate($this);
+		$result = $this->db()->fetchRow($sql, $params, $fetchStyle);
 		
-		return $this->db()->fetchRow($sql, $params, $fetchStyle);
+		if ($result) {
+			return $this->relationMap()->applyToRow($result);
+		}
+		
+		return null;
 	}
 }

@@ -28,11 +28,12 @@ class SelectSqlGenerator
 	public function generate()
 	{
 		$table = $this->query->table();
+		$dbName = $table->db()->schemaName();
 		$whereClause = new WhereClauseGenerator($table, $this->query->whereGroups());
 		$parts = [
 			"SELECT",
 			$this->columnList(),
-			"FROM `{$table->name()}` AS `{$table->alias()}`",
+			"FROM `{$dbName}`.`{$table->name()}` AS `{$table->alias()}`",
 			$this->joinClause(),
 			$whereClause->generate(),
 			$this->groupClause(),
@@ -65,6 +66,7 @@ class SelectSqlGenerator
 		$lines = [];
 		foreach ($this->query->joins() as $join) {
 			$foreignTable = $join->foreignTable();
+			$foreignDbName = $foreignTable->db()->schemaName();
 			$foreignKeys = $join->foreignKeys();
 			$localTable = empty($join->localTable()) ? $this->query->table() : $join->localTable();
 			$localKeys = $join->localKeys();
@@ -95,7 +97,7 @@ class SelectSqlGenerator
 					break;
 			}
 			
-			$lines[] = "{$expr} `{$foreignTable->name()}` AS `{$foreignTable->alias()}` ON ". implode(" AND ", $conditions);
+			$lines[] = "{$expr} `{$foreignDbName}`.`{$foreignTable->name()}` AS `{$foreignTable->alias()}` ON ". implode(" AND ", $conditions);
 		}
 		
 		return implode("\n", $lines);

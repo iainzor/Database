@@ -13,12 +13,11 @@ class GenericTable extends AbstractTable
 	 * @param string $name
 	 * @param PDO $db
 	 */
-	public function __construct($name, PDO $db)
+	public function __construct($name, PDO $db = null)
 	{	
 		parent::__construct($db);
 		
 		$this->_name = $name;
-		$this->db($db);
 	}
 	
 	/**

@@ -31,19 +31,19 @@ class Registry
 	/**
 	 * Get a connection by its name
 	 * 
-	 * @param string $name
+	 * @param string $id
 	 * @return PDO
 	 * @throws \Exception
 	 */
-	public function get($name)
+	public function get($id)
 	{
-		if ($name === Config::DEFAULT_CONNECTION) {
+		if ($id === Config::DEFAULT_CONNECTION) {
 			return $this->defaultConnection();
 		}
-		if (!isset($this->connections[$name])) {
-			throw new \Exception("Unknown connection name '{$name}'");
+		if (!isset($this->connections[$id])) {
+			throw new \Exception("Unknown connection name '{$id}'");
 		}
-		return $this->_pdo($name, $this->connections[$name]);
+		return $this->_pdo($id, $this->connections[$id]);
 	}
 	
 	/**

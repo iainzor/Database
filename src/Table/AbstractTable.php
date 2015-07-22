@@ -2,10 +2,22 @@
 namespace Database\Table;
 
 use Database\PDO,
-	Database\Query;
+	Database\Query,
+	Database\Registry,
+	Database\Config;
 
 abstract class AbstractTable
 {
+	/**
+	 * @var Registry
+	 */
+	private static $dbRegistry;
+	
+	/**
+	 * @var string
+	 */
+	protected $connectionId = Config::DEFAULT_CONNECTION;
+	
 	/**
 	 * @var PDO
 	 */
@@ -25,6 +37,16 @@ abstract class AbstractTable
 	 * @var Column[]
 	 */
 	private $columns = [];
+	
+	/**
+	 * Set the database registry used to find database connections for tables
+	 * 
+	 * @param Registry $registry
+	 */
+	public static function dbRegistry(Registry $registry)
+	{
+		self::$dbRegistry = $registry;
+	}
 
 	/**
 	 * @return string
@@ -36,9 +58,26 @@ abstract class AbstractTable
 	 * 
 	 * @param PDO $db
 	 */
-	public function __construct(PDO $db)
+	public function __construct(PDO $db = null)
 	{
-		$this->db($db);
+		if ($db !== null) {
+			$this->db = $db;
+		}
+	}
+	
+	/**
+	 * Get or set the connection ID of the table
+	 * 
+	 * @param string $id
+	 * @return string
+	 */
+	public function connectionId($id = null)
+	{
+		if ($id !== null) {
+			$this->connectionId = $id;
+			$this->db = null;
+		}
+		return $this->connectionId;
 	}
 	
 	/**
@@ -52,6 +91,13 @@ abstract class AbstractTable
 		if ($db !== null) {
 			$this->db = $db;
 		}
+		
+		if (!$this->db && self::$dbRegistry) {
+			$this->db = self::$dbRegistry->get($this->connectionId);
+		} else if (!$this->db) {
+			throw new \Exception("No database or connection registry has been provided to the table");
+		}
+		
 		return $this->db;
 	}
 	

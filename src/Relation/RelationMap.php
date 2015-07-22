@@ -51,12 +51,12 @@ class RelationMap
 	 * Create a new one-to-one relationship
 	 * 
 	 * @param string $name
-	 * @param ReferenceInterface $reference
+	 * @param mixed $reference
 	 * @param string|array $localKeys
 	 * @param string|array $foreignKeys
 	 * @return OneToOneRelation
 	 */
-	public function hasOne($name, ReferenceInterface $reference, $localKeys, $foreignKeys)
+	public function hasOne($name, $reference, $localKeys, $foreignKeys)
 	{
 		$relation = new OneToOneRelation($reference, $localKeys, $foreignKeys);
 		
@@ -69,12 +69,12 @@ class RelationMap
 	 * Create a new one-to-many relationship
 	 * 
 	 * @param string $name
-	 * @param ReferenceInterface $reference
+	 * @param mixed $reference
 	 * @param string|array $localKeys
 	 * @param string|array $foreignKeys
 	 * @return OneToOneRelation
 	 */
-	public function hasMany($name, ReferenceInterface $reference, $localKeys, $foreignKeys)
+	public function hasMany($name, $reference, $localKeys, $foreignKeys)
 	{
 		$relation =  new OneToManyRelation($reference, $localKeys, $foreignKeys);
 		
@@ -128,5 +128,17 @@ class RelationMap
 		}
 		
 		return $rows;
+	}
+	
+	/**
+	 * Apply all relations to a single row
+	 * 
+	 * @param array $row
+	 * @return array
+	 */
+	public function applyToRow(array $row)
+	{
+		$applied = $this->applyToRowset([$row]);
+		return array_shift($applied);
 	}
 }

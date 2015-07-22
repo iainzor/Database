@@ -13,6 +13,8 @@ class Module extends AbstractModule
 	public function init()
 	{
 		$this->registry = new Registry();
+		
+		Table\AbstractTable::dbRegistry($this->registry);
 	}
 	
 	/**
