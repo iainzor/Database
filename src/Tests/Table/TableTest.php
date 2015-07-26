@@ -50,4 +50,18 @@ class TableTest extends \PHPUnit_Framework_TestCase
 		
 		$this->assertEquals($secondDb, $tableB->db());
 	}
+	
+	public function testStructure()
+	{
+		$table = new GenericTable("my_table", TestDb::pdo());
+		
+		$this->assertInstanceOf("\\Database\\Table\\Structure", $table->structure());
+		
+		$table->structure()->column("id", [
+			"alias" => "my_id",
+			"type" => "int"
+		]);
+		
+		$this->assertEquals("my_id", $table->column("id")->alias());
+	}
 }

@@ -34,9 +34,9 @@ abstract class AbstractTable
 	private $alias;
 	
 	/**
-	 * @var Column[]
+	 * @var Structure
 	 */
-	private $columns = [];
+	private $structure;
 	
 	/**
 	 * Set the database registry used to find database connections for tables
@@ -62,6 +62,11 @@ abstract class AbstractTable
 	{
 		if ($db !== null) {
 			$this->db = $db;
+		}
+		
+		$this->structure = new Structure();
+		if ($this instanceof StructureProviderInterface) {
+			$this->initStructure($this->structure);
 		}
 	}
 	
@@ -131,20 +136,35 @@ abstract class AbstractTable
 		}
 		return isset($this->alias) ? $this->alias : $this->name();
 	}
+	
+	/**
+	 * Get or set the table's structure 
+	 * 
+	 * @param Structure $structure
+	 * @return Structure
+	 */
+	public function structure(Structure $structure = null)
+	{
+		if ($structure !== null) {
+			$this->structure = $structure;
+		}
+		return $this->structure;
+	}
 
 	/**
 	 * Get a column from the table
 	 * If the column requested doesn't exist, it will be created and added to the table's columns
 	 * 
 	 * @param string $name
+	 * @param array $config
 	 * @return Column
 	 */
-	public function column($name)
+	public function column($name, array $config = null)
 	{
-		if (!isset($this->columns[$name])) {
-			$this->columns[$name] = new Column($name, $this);
-		}
-		return $this->columns[$name];
+		$column = $this->structure->column($name, $config);
+		$column->table($this);
+		
+		return $column;
 	}
 	
 	/**

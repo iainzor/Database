@@ -3,7 +3,6 @@ namespace Database\Reference;
 
 use Database\Table\AbstractTable,
 	Database\Table\GenericTable,
-	Database\Query\SelectQuery,
 	Database\PDO;
 
 class TableReference implements ReferenceInterface
@@ -59,10 +58,17 @@ class TableReference implements ReferenceInterface
 			throw new \Exception("No database instance has been given to the referenced table");
 		}
 		
-		$query = new SelectQuery($this->table->db());
-		$query->from($this->table);
+		$query = $this->table()->select();
 		$query->where($conditions);
 		
 		return $query->fetchAll();
+	}
+	
+	/**
+	 * @return \Database\Table\Structure
+	 */
+	public function structure()
+	{
+		return $this->table->structure();
 	}
 }

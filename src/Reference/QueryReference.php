@@ -32,4 +32,14 @@ class QueryReference implements ReferenceInterface
 		
 		return $this->query->fetchAll();
 	}
+	
+	/**
+	 * Get the structure of the referenced query
+	 * 
+	 * @return \Database\Table\Structure
+	 */
+	public function structure() 
+	{
+		return $this->query->table()->structure();
+	}
 }

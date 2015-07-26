@@ -42,6 +42,8 @@ class SelectQuery extends AbstractQuery
 	{
 		$instance = $this->table($table);
 		$instance->db($db);
+		
+		$this->relationMap()->table($instance);
 	}
 	
 	/**
@@ -61,7 +63,7 @@ class SelectQuery extends AbstractQuery
 		$sql = $driverFactory->sqlGenerator()->generate($this);
 		$results = $this->db()->fetchAll($sql, $params, $fetchStyle);
 		
-		return $this->relationMap()->applyToRowset($results);
+		return $this->_parseResults($results);
 	}
 	
 	/**
@@ -73,14 +75,24 @@ class SelectQuery extends AbstractQuery
 	 */
 	public function fetchRow(array $params = [], $fetchStyle = PDO::FETCH_ASSOC)
 	{
-		$driverFactory = $this->db()->driverFactory();
-		$sql = $driverFactory->sqlGenerator()->generate($this);
-		$result = $this->db()->fetchRow($sql, $params, $fetchStyle);
+		$maxResults = $this->maxResults();
+		$this->maxResults(1);
 		
-		if ($result) {
-			return $this->relationMap()->applyToRow($result);
-		}
+		$all = $this->fetchAll($params, $fetchStyle);
+		$this->maxResults($maxResults);
 		
-		return null;
+		return count($all) ? array_shift($all) : null;
+	}
+	
+	private function _parseResults(array $results)
+	{
+		$map = $this->relationMap();
+		$structure = $this->table()->structure();
+		$results = $map->applyToRowset($results);
+		$results = $structure->parseRowset($results, $map);
+		
+		//var_dump($results);
+		
+		return $results;
 	}
 }

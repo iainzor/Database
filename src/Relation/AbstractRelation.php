@@ -2,6 +2,7 @@
 namespace Database\Relation;
 
 use Database\Table\AbstractTable,
+	Database\Table\Structure,
 	Database\Query\SelectQuery,
 	Database\Reference;
 
@@ -11,6 +12,11 @@ abstract class AbstractRelation
 	 * @var Reference\ReferenceInterface
 	 */
 	protected $reference;
+	
+	/**
+	 * @var AbstractTable
+	 */
+	protected $localTable;
 	
 	/**
 	 * @var array
@@ -45,6 +51,20 @@ abstract class AbstractRelation
 		if (count($this->localKeys) !== count($this->foreignKeys)) {
 			throw new \Exception("Local and foreign keys cannot be different lengths");
 		}
+	}
+	
+	/**
+	 * Get or set the local table this relation is tied to
+	 * 
+	 * @param AbstractTable $table
+	 * @return AbstractTable $table
+	 */
+	public function localTable(AbstractTable $table = null)
+	{
+		if ($table !== null) {
+			$this->localTable = $table;
+		}
+		return $this->localTable;
 	}
 	
 	/**
@@ -147,6 +167,7 @@ abstract class AbstractRelation
 	public function findAll(array $rows)
 	{
 		$params = [];
+		
 		foreach ($rows as $row) {
 			foreach ($this->localKeys as $i => $localKey) {
 				$foreignKey = $this->foreignKeys[$i];
@@ -157,12 +178,12 @@ abstract class AbstractRelation
 			}
 		}
 		
+		$results = [];
 		if (count($params)) {
 			$results = $this->reference->findAll($params);
-			return $this->relationMap->applyToRowset($results);
 		}
 		
-		return [];
+		return $results;
 	}
 	
 	/**

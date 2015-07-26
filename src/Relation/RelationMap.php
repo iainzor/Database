@@ -1,14 +1,45 @@
 <?php
 namespace Database\Relation;
 
-use Database\Reference\ReferenceInterface;
+use Database\Table\AbstractTable,
+	Database\Table\GenericTable,
+	Database\Table\Structure;
 
 class RelationMap
 {
 	/**
+	 * @var AbstractTable
+	 */
+	private $table;
+	
+	/**
 	 * @var AbstractRelation[]
 	 */
 	private $relations = [];
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param AbstractTable $table
+	 */
+	public function __construct(AbstractTable $table = null)
+	{
+		$this->table($table);
+	}
+	
+	/**
+	 * Get or set the table the relation map is for
+	 * 
+	 * @param AbstractTable $table
+	 * @return AbstractTable
+	 */
+	public function table(AbstractTable $table = null)
+	{
+		if ($table !== null) {
+			$this->table = $table;
+		}
+		return $this->table;
+	}
 	
 	/**
 	 * Generate a new RelationMap from a set of relation configurations
@@ -114,6 +145,17 @@ class RelationMap
 	}
 	
 	/**
+	 * Check if a relation exists in the map
+	 * 
+	 * @param string $name
+	 * @return boolean
+	 */
+	public function relationExists($name)
+	{
+		return isset($this->relations[$name]);
+	}
+	
+	/**
 	 * Apply the relation map to a set of rows
 	 * 
 	 * @param array $rows
@@ -123,7 +165,6 @@ class RelationMap
 	{
 		foreach ($this->relations as $name => $relation) {
 			$results = $relation->findAll($rows);
-			
 			$relation->assignResults($name, $results, $rows);
 		}
 		
@@ -138,7 +179,7 @@ class RelationMap
 	 */
 	public function applyToRow(array $row)
 	{
-		$applied = $this->applyToRowset([$row]);
-		return array_shift($applied);
+		$rows = $this->applyToRowset([$row]);
+		return array_shift($rows);
 	}
 }

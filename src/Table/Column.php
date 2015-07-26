@@ -114,6 +114,8 @@ class Column
 			$instance = $type;
 			
 			if (is_string($type)) {
+				$instance = null;
+				
 				if (class_exists($type)) {
 					$instance = new $type();
 				} else {
@@ -121,6 +123,10 @@ class Column
 					if (class_exists($className)) {
 						$instance = new $className();
 					}
+				}
+				
+				if (!$instance) {
+					throw new \InvalidArgumentException("Invalid value type: {$type}");
 				}
 			}
 			
