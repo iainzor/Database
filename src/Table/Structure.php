@@ -97,7 +97,7 @@ class Structure
 	 * @param array $rows
 	 * @return array
 	 */
-	public function parseRowset(array $rows, RelationMap $map)
+	public function parseRowset(array $rows, RelationMap $map = null)
 	{
 		foreach ($rows as $i => $row) {
 			$rows[$i] = $this->parseRow($row, $map);

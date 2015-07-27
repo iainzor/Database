@@ -2,7 +2,8 @@
 namespace Database\Driver\Mysql;
 
 use Database\Query\SelectQuery,
-	Database\Table\AbstractTable;
+	Database\Table\AbstractTable,
+	Database\Table\ColumnExpr;
 
 class SelectSqlGenerator
 {
@@ -83,6 +84,10 @@ class SelectSqlGenerator
 	{
 		if (is_numeric($name)) {
 			$name = $alias;
+		}
+		
+		if ($name instanceof ColumnExpr) {
+			return $name->expr();
 		}
 		
 		$parts = [

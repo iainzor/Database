@@ -84,6 +84,25 @@ class SelectQuery extends AbstractQuery
 		return count($all) ? array_shift($all) : null;
 	}
 	
+	/**
+	 * Fetch a single column from the query
+	 * 
+	 * @param array $params
+	 * @param int $column
+	 * @return mixed
+	 */
+	public function fetchColumn(array $params = [], $column = 0)
+	{
+		$row = $this->fetchRow($params);
+		if ($row) {
+			$keys = array_keys($row);
+			if (isset($keys[$column])) {
+				return $row[$keys[$column]];
+			}
+		}
+		return null;
+	}
+	
 	private function _parseResults(array $results)
 	{
 		$map = $this->relationMap();
