@@ -72,14 +72,7 @@ class StructureTest extends \PHPUnit_Framework_TestCase
 	
 	public function testPreserveRelations()
 	{
-		$fooTable = new GenericTable("foos");
-		$fooTable->structure()->columns([
-			"id" => [
-				"type" => "int"
-			]
-		]);
-		
-		$structure = new Structure([
+		$barStruct = new Structure([
 			"id" => [
 				"type" => "int"
 			],
@@ -88,18 +81,20 @@ class StructureTest extends \PHPUnit_Framework_TestCase
 				"type" => "int"
 			]
 		]);
+		$barMap = new RelationMap();
+		$barMap->hasOne("foo", "foos", "foo_id", "id");
 		
-		$map = new RelationMap();
-		$map->hasOne("foo", $fooTable, "foo_id", "id");
-		
-		$data = $structure->parseRow([
+		$data = $barStruct->parseRow([
 			"id" => "123",
 			"foo_id" => "321",
 			"foo" => [
 				"id" => 321,
 				"bar" => "baz"
 			]
-		], $map);
+		], $barMap);
+		
+		//var_dump($data);
+		//exit;
 		
 		$this->assertSame($data["fooId"], $data["foo"]["id"]);
 	}

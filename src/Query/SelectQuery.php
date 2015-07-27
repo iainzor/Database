@@ -87,9 +87,9 @@ class SelectQuery extends AbstractQuery
 	private function _parseResults(array $results)
 	{
 		$map = $this->relationMap();
-		$structure = $this->table()->structure();
+		//$structure = $this->table()->structure();
+		//$results = $structure->parseRowset($results, $map);
 		$results = $map->applyToRowset($results);
-		$results = $structure->parseRowset($results, $map);
 		
 		//var_dump($results);
 		

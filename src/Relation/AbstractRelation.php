@@ -2,12 +2,16 @@
 namespace Database\Relation;
 
 use Database\Table\AbstractTable,
-	Database\Table\Structure,
 	Database\Query\SelectQuery,
 	Database\Reference;
 
 abstract class AbstractRelation
 {
+	/**
+	 * @var RelationMap
+	 */
+	private $parentMap;
+	
 	/**
 	 * @var Reference\ReferenceInterface
 	 */
@@ -39,9 +43,11 @@ abstract class AbstractRelation
 	 * @param mixed $reference
 	 * @param string|array $localKeys
 	 * @param string|array $foreignKeys
+	 * @param RelationMap $parentMap The RelationMap this relation belongs to
 	 */
-	public function __construct($reference, $localKeys, $foreignKeys)
+	public function __construct($reference, $localKeys, $foreignKeys, RelationMap $parentMap = null)
 	{
+		$this->parentMap = $parentMap;
 		$this->relationMap = new RelationMap();
 		$this->localKeys = is_array($localKeys) ? array_values($localKeys) : [$localKeys];
 		$this->foreignKeys = is_array($foreignKeys) ? array_values($foreignKeys) : [$foreignKeys];
@@ -69,7 +75,7 @@ abstract class AbstractRelation
 	
 	/**
 	 * Get or set the referenced object 
-	 * When setting, the value can be a DB Table instance or name, a SelectQuery instance, or a ReferenceInterface instance
+	 * When setting, the value can be a DB Table instance, DB name, a SelectQuery instance, or a ReferenceInterface instance
 	 * 
 	 * @param mixed $reference
 	 * @return Reference\ReferenceInterface

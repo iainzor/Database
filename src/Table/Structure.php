@@ -63,9 +63,10 @@ class Structure
 	 * Parse a single row according to the defined structure
 	 * 
 	 * @param array|object $row
+	 * @param RelationMap $map
 	 * @return array|object
 	 */
-	public function parseRow($row, RelationMap $map)
+	public function parseRow($row, RelationMap $map = null)
 	{
 		if (empty($this->columns)) {
 			return $row;
@@ -77,11 +78,10 @@ class Structure
 				$column = $this->columns[$name];
 				$alias = $column->alias();
 				$parsed[$alias] = $column->parseValue($value); 
-			} else if ($map->relationExists($name)) {
-				var_dump($name);
+			} else if ($map && $map->relationExists($name)) {
 				$relation = $map->relation($name);
 				$structure = $relation->reference()->structure();
-				$parsed[$alias] = $structure->parseRow($value, $relation->relationMap());
+				$parsed[$name] = $structure->parseRow($value, $relation->relationMap());
 			}
 		}
 		

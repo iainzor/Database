@@ -89,7 +89,7 @@ class RelationMap
 	 */
 	public function hasOne($name, $reference, $localKeys, $foreignKeys)
 	{
-		$relation = new OneToOneRelation($reference, $localKeys, $foreignKeys);
+		$relation = new OneToOneRelation($reference, $localKeys, $foreignKeys, $this);
 		
 		$this->relations[$name] = $relation;
 		
@@ -107,7 +107,7 @@ class RelationMap
 	 */
 	public function hasMany($name, $reference, $localKeys, $foreignKeys)
 	{
-		$relation =  new OneToManyRelation($reference, $localKeys, $foreignKeys);
+		$relation =  new OneToManyRelation($this, $reference, $localKeys, $this);
 		
 		$this->relations[$name] = $relation;
 		
@@ -165,6 +165,7 @@ class RelationMap
 	{
 		foreach ($this->relations as $name => $relation) {
 			$results = $relation->findAll($rows);
+			$results = $relation->relationMap()->applyToRowset($results);
 			$relation->assignResults($name, $results, $rows);
 		}
 		

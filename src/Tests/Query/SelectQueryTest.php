@@ -2,6 +2,7 @@
 namespace Database\Tests\Query;
 
 use Database\Query\SelectQuery,
+	Database\Table\GenericTable,
 	Database\Tests\TestDb;
 
 class SelectQueryTest extends \PHPUnit_Framework_Testcase
@@ -69,5 +70,48 @@ class SelectQueryTest extends \PHPUnit_Framework_Testcase
 		$joinExpr = $query->join("roles", "id")->on("users", "roleId");
 		
 		$this->assertSame($query->table(), $joinExpr->localTable());
+	}
+	
+	public function testQueryWithMapAndStructure()
+	{
+		$db = TestDb::pdo();
+		
+		$serverTable = new GenericTable("servers", $db);
+		$serverTable->structure()->columns([
+			"id" => [
+				"alias" => "serverId",
+				"type" => "int"
+			],
+			"gameId" => [
+				"alias" => "serverGameId",
+				"type" => "int"
+			],
+			"ip" => [
+				"alias" => "serverIp",
+				"type" => "varchar"
+			]
+		]);
+		
+		$gameTable = new GenericTable("games", $db);
+		$gameTable->structure()->columns([
+			"id" => [
+				"alias" => "gameId",
+				"type" => "int"
+			],
+			"name" => [
+				"alias" => "gameName",
+				"type" => "varchar"
+			]
+		]);
+		
+		$serverQuery = $serverTable->select();
+		$serverQuery->hasOne("game", $gameTable, "gameId", "id");
+		
+		$server = $serverQuery->fetchRow();
+		
+		//print_r($server);
+		
+		//$this->assertTrue(isset($server["serverId"]));
+		$this->assertTrue(isset($server["game"]));
 	}
 }
