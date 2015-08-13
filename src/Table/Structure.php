@@ -82,6 +82,8 @@ class Structure
 				$relation = $map->relation($name);
 				$structure = $relation->reference()->structure();
 				$parsed[$name] = $structure->parseRow($value, $relation->relationMap());
+			} else {
+				$parsed[$name] = $value;
 			}
 		}
 		

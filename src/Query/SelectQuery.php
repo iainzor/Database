@@ -32,6 +32,16 @@ class SelectQuery extends AbstractQuery
 	}
 	
 	/**
+	 * Add a column to retieve from the query
+	 * 
+	 * @param mixed $column
+	 */
+	public function addColumn($column)
+	{
+		$this->columns[] = $column;
+	}
+	
+	/**
 	 * Set the table to select from
 	 * 
 	 * @param mixed $table
