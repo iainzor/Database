@@ -209,4 +209,17 @@ abstract class AbstractTable
 		
 		return $query->execute();
 	}
+	
+	/**
+	 * Create a new UpdateQuery instance for the table
+	 * 
+	 * @return \Database\Query\UpdateQuery
+	 */
+	public function update()
+	{
+		$query = new Query\UpdateQuery($this->db());
+		$query->table($this);
+		
+		return $query;
+	}
 }

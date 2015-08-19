@@ -57,6 +57,26 @@ class SqlGeneratorTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, $cleaned);
 	}
 	
+	public function testCreateUpdateStatement()
+	{
+		$factory = new DriverFactory();
+		$db = TestDb::pdo();
+		$query = new Query\UpdateQuery($db);
+		$query->table("my_table");
+		$query->values([
+			"foo" => "bar",
+			"bar" => "baz"
+		]);
+		$query->where(["id" => 123]);
+		$sql = $factory->sqlGenerator()->generate($query);
+		$cleaned = $this->_clean($sql);
+		$expected = "UPDATE `my_table` "
+				  . "SET `foo` = 'bar', `bar` = 'baz' "
+				  . "WHERE (`my_table`.`id` = '123')";
+		
+		$this->assertEquals($expected, $cleaned);
+	}
+	
 	/**
 	 * Clean a SQL string
 	 * 
@@ -65,6 +85,8 @@ class SqlGeneratorTest extends \PHPUnit_Framework_TestCase
 	 */
 	private function _clean($sql)
 	{
-		return preg_replace("/\n/", " ", $sql);
+		return preg_replace("/\n/", " ", 
+			preg_replace("/\s{2,}/", " ", trim($sql))
+		);
 	}
 }

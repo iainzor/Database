@@ -25,6 +25,9 @@ class SqlGenerator implements SqlGeneratorInterface
 		} else if ($query instanceof Query\InsertQuery) {
 			$generator = new InsertSqlGenerator($query);
 			return $generator->generate();
+		} else if ($query instanceof Query\UpdateQuery) {
+			$generator = new UpdateSqlGenerator($query);
+			return $generator->generate();
 		}
 		
 		throw new \Exception("Could not generate a SQL statement using the query '". get_class($query) ."'");

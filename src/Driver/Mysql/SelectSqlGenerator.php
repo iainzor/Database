@@ -31,16 +31,20 @@ class SelectSqlGenerator
 	{
 		$table = $this->query->table();
 		$dbName = $table->db()->schemaName();
-		$whereClause = new WhereClauseGenerator($table, $this->query->whereGroups());
+		
+		$whereGenerator = new WhereClauseGenerator($table, $this->query->whereGroups());
+		$orderGenerator = new OrderClauseGenerator($table, $this->query->orderings());
+		$limitGenerator = new LimitClauseGenerator($table, $this->query->maxResults(), $this->query->resultOffset());
+		
 		$parts = [
 			"SELECT",
 			$this->columnList(),
 			"FROM `{$dbName}`.`{$table->name()}` AS `{$table->alias()}`",
 			$this->joinClause(),
-			$whereClause->generate(),
+			$whereGenerator->generate(),
 			$this->groupClause(),
-			$this->orderClause(),
-			$this->limitClause()
+			$orderGenerator->generate(),
+			$limitGenerator->generate()
 		];
 			
 		$sql = implode("\n", $parts);
@@ -170,56 +174,5 @@ class SelectSqlGenerator
 		}
 		
 		return count($parts) ? "GROUP BY ". implode(", ", $parts) : null;
-	}
-	
-	/**
-	 * Generate an ORDER clause the query
-	 * 
-	 * @return string
-	 */
-	private function orderClause()
-	{
-		$parts = [];
-		foreach ($this->query->orderings() as $expr) {
-			$column = $expr->column();
-			$table = $column->table();
-			
-			switch ($expr->direction()) {
-				case SelectQuery::SORT_DESC:
-					$dir = "DESC";
-					break;
-				case SelectQuery::SORT_ASC:
-				default:
-					$dir = "ASC";
-					break;
-			}
-			
-			$parts[] = sprintf("`%s`.`%s` %s", $table->alias(), $column->name(), $dir);
-		}
-		
-		return count($parts) ? "ORDER BY ". implode(", ", $parts) : null;
-	}
-	
-	/**
-	 * Generate a LIMIT clause for the query
-	 * 
-	 * @param int $maxResults
-	 * @param int $resultOffset
-	 * @return string
-	 */
-	private function limitClause()
-	{
-		$maxResults = $this->query->maxResults(); 
-		$resultOffset = $this->query->resultOffset();
-		
-		if ($maxResults < 1) {
-			return null;
-		}
-		
-		$clause = "LIMIT ". $maxResults;
-		if ($resultOffset > 0) {
-			$clause .= " OFFSET ". $resultOffset;
-		}
-		return $clause;
 	}
 }
