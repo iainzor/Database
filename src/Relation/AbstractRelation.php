@@ -104,7 +104,9 @@ abstract class AbstractRelation
 		}
 		
 		if (!($reference instanceof Reference\ReferenceInterface)) {
-			throw new \UnexpectedValueException("Reference must be a string, array, AbstractTable, SelectQuery or an instance of ReferenceInterface");
+			$className = get_class($reference);
+			
+			throw new \UnexpectedValueException("Reference must be a string, array, AbstractTable, SelectQuery or an instance of ReferenceInterface.  {$className} given");
 		}
 		
 		return $reference;

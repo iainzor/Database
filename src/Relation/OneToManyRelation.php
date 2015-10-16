@@ -19,7 +19,7 @@ class OneToManyRelation extends AbstractRelation
 			
 			foreach ($foreignRows as $foreignRow) {
 				if ($this->rowsMatch($localRow, $foreignRow)) {
-					$localRows[$i][$assignAs] = $foreignRow;
+					$localRows[$i][$assignAs][] = $foreignRow;
 				}
 			}
 		}

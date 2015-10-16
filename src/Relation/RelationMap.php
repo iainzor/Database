@@ -107,7 +107,7 @@ class RelationMap
 	 */
 	public function hasMany($name, $reference, $localKeys, $foreignKeys)
 	{
-		$relation =  new OneToManyRelation($this, $reference, $localKeys, $this);
+		$relation =  new OneToManyRelation($reference, $localKeys, $foreignKeys, $this);
 		
 		$this->relations[$name] = $relation;
 		
