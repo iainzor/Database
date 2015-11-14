@@ -37,7 +37,7 @@ class WhereClauseGenerator
 	 * 
 	 * @return string
 	 */
-	public function generate()
+	public function generate($prepend = "WHERE")
 	{
 		$groups = [];
 		foreach ($this->whereGroups as $whereGroup) {
@@ -48,7 +48,7 @@ class WhereClauseGenerator
 			}
 		}
 		
-		return count($groups) ? "WHERE ". implode(" ", $groups) : null;
+		return count($groups) ? "{$prepend} ". implode(" ", $groups) : null;
 	}
 	
 	/**

@@ -6,6 +6,8 @@ use Database\Table\AbstractTable,
 
 class JoinExpr
 {
+	use Traits\WhereTrait;
+	
 	/**
 	 * @var AbstractQuery
 	 */

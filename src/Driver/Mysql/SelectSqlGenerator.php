@@ -125,11 +125,7 @@ class SelectSqlGenerator
 					continue;
 				}
 				$localKey = $localKeys[$i];
-				$conditions[] = "`{$localTable->alias()}`.`{$localKey}` = `{$foreignTable->alias()}`.`{$foreignKey}`";
-			}
-			
-			if (empty($conditions)) {
-				throw new \Exception("No conditions found for join: {$localTable->name()} -> {$foreignTable->name()}");
+				$join->where("`{$localTable->alias()}`.`{$localKey}` = `{$foreignTable->alias()}`.`{$foreignKey}`");
 			}
 			
 			switch ($join->type()) {
@@ -145,19 +141,14 @@ class SelectSqlGenerator
 					break;
 			}
 			
-			$lines[] = "{$expr} `{$foreignDbName}`.`{$foreignTable->name()}` AS `{$foreignTable->alias()}` ON ". implode(" AND ", $conditions);
+			$whereClauseGenerator = new WhereClauseGenerator($foreignTable, $join->whereGroups());
+			$whereClause = $whereClauseGenerator->generate("ON");
+		
+			$lines[] = "{$expr} `{$foreignDbName}`.`{$foreignTable->name()}` AS `{$foreignTable->alias()}` {$whereClause}";
 		}
 		
 		return implode("\n", $lines);
 	}
-	
-	/**
-	 * Generate the WHERE clause of the query
-	 * 
-	 * @return string
-	 */
-	public function whereClause()
-	{}
 	
 	/**
 	 * Generate a GROUP BY clause for the query

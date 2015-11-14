@@ -65,12 +65,7 @@ class SelectQuery extends AbstractQuery
 	 */
 	public function fetchAll(array $params = [], $fetchStyle = PDO::FETCH_ASSOC)
 	{
-		if (!$this->db()) {
-			throw new \Exception("No database instance has been given to the query");
-		}
-		
-		$driverFactory = $this->db()->driverFactory();
-		$sql = $driverFactory->sqlGenerator()->generate($this);
+		$sql = $this->generateSQL();
 		$results = $this->db()->fetchAll($sql, $params, $fetchStyle);
 		
 		return $this->_parseResults($results);

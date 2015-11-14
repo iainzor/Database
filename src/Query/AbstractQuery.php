@@ -70,4 +70,20 @@ abstract class AbstractQuery implements QueryInterface
 		
 		return $this->table;
 	}
+	
+	/**
+	 * Generate a SQL statement from the query
+	 * 
+	 * @throws \Exception
+	 * @return string
+	 */
+	public function generateSQL()
+	{
+		if (!$this->db()) {
+			throw new \Exception("No database instance has been given to the query");
+		}
+		
+		$driverFactory = $this->db()->driverFactory();
+		return $driverFactory->sqlGenerator()->generate($this);
+	}
 }
