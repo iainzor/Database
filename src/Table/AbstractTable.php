@@ -124,6 +124,24 @@ abstract class AbstractTable
 	}
 	
 	/**
+	 * Generate a fully qualified name for the table: [dbName.]tableName
+	 * If no schema name can be found it will be left out.
+	 * 
+	 * @param type $quoted
+	 * @return type
+	 */
+	public function fullName($quoted = false)
+	{
+		$schema = $this->db()->schemaName();
+		$table = $this->name();
+		$parts = empty($schema) ? [$table] : [$schema, $table];
+		
+		return $quoted
+			? "`". implode("`.`", $parts) ."`"
+			: implode(".", $parts);
+	}
+	
+	/**
 	 * Get or set the alias of the table.  If no alias has been set, the table's name will be returned
 	 * 
 	 * @param string $alias

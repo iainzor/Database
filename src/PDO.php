@@ -11,7 +11,7 @@ class PDO extends \PDO
 	/**
 	 * @var string
 	 */
-	private $schemaName;
+	private $schemaName = null;
 	
 	/**
 	 * @var string
@@ -44,12 +44,15 @@ class PDO extends \PDO
 	}
 	
 	/**
-	 * Get the name of the driver being used
+	 * Get or set the name of the driver being used
 	 * 
 	 * @return string
 	 */
-	public function driver()
+	public function driver($driver = null)
 	{
+		if ($driver !== null) {
+			$this->driver = $driver;
+		}
 		return $this->driver;
 	}
 	
@@ -65,19 +68,25 @@ class PDO extends \PDO
 		if (class_exists($className)) {
 			return new $className();
 		}
-		throw new \Exception("No driver factory found for '{$this->driver}'");
+		return false;
+		//throw new \Exception("No driver factory found for '{$this->driver}'");
 	}
 	
 	/**
-	 * Get the name of the database currently connected to
+	 * Get or set the name of the database currently connected to
 	 * 
 	 * @return string
 	 */
-	public function schemaName()
+	public function schemaName($name = null)
 	{
-		if (!$this->schemaName) {
+		if ($name !== null) {
+			$this->schemaName = $name;
+		}
+		
+		if ($this->schemaName === null) {
 			$this->schemaName = $this->fetchColumn("SELECT DATABASE()");
 		}
+		
 		return $this->schemaName;
 	}
 	

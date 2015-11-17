@@ -84,6 +84,8 @@ abstract class AbstractQuery implements QueryInterface
 		}
 		
 		$driverFactory = $this->db()->driverFactory();
-		return $driverFactory->sqlGenerator()->generate($this);
+		if ($driverFactory) {
+			return $driverFactory->sqlGenerator()->generate($this);
+		}
 	}
 }

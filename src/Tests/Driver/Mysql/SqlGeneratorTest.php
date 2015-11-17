@@ -15,8 +15,8 @@ class SqlGeneratorTest extends \PHPUnit_Framework_TestCase
 		$cleaned = $this->_clean($sql);
 		$expected = "SELECT `players`.*, `suspensions`.`id` AS `suspensionId`, `suspensions`.`date` AS `date` "
 				  . "FROM `bliss_database_tests`.`players` AS `players` "
-				  . "JOIN `bliss_database_tests`.`servers` AS `servers` ON `players`.`serverId` = `servers`.`id` "
-				  . "LEFT JOIN `bliss_database_tests`.`suspensions` AS `suspensions` ON `players`.`id` = `suspensions`.`playerId` "
+				  . "JOIN `bliss_database_tests`.`servers` AS `servers` ON (`players`.`serverId` = `servers`.`id`) "
+				  . "LEFT JOIN `bliss_database_tests`.`suspensions` AS `suspensions` ON (`players`.`id` = `suspensions`.`playerId`) "
 				  . "WHERE (`players`.`id` > :maxId AND `players`.`name` LIKE :name AND `servers`.`id` IS NOT NULL) OR (`players`.`role` = 'admin') "
 				  . "GROUP BY `servers`.`id` "
 				  . "ORDER BY `servers`.`name` ASC, `players`.`name` DESC "

@@ -36,10 +36,15 @@ class SelectSqlGenerator
 		$orderGenerator = new OrderClauseGenerator($table, $this->query->orderings());
 		$limitGenerator = new LimitClauseGenerator($table, $this->query->maxResults(), $this->query->resultOffset());
 		
+		if (!empty($dbName)) {
+			$dbName = "`{$dbName}`.";
+		}
+		
 		$parts = [
 			"SELECT",
 			$this->columnList(),
-			"FROM `{$dbName}`.`{$table->name()}` AS `{$table->alias()}`",
+			//"FROM {$dbName}`{$table->name()}` AS `{$table->alias()}`",
+			"FROM {$table->fullName(true)} AS `{$table->alias()}`",
 			$this->joinClause(),
 			$whereGenerator->generate(),
 			$this->groupClause(),
