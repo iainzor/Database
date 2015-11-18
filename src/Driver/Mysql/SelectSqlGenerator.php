@@ -130,7 +130,7 @@ class SelectSqlGenerator
 					continue;
 				}
 				$localKey = $localKeys[$i];
-				$join->where("`{$localTable->alias()}`.`{$localKey}` = `{$foreignTable->alias()}`.`{$foreignKey}`");
+				$join->where("{$localTable->fullName(true)}.`{$localKey}` = {$foreignTable->fullName(true)}.`{$foreignKey}`");
 			}
 			
 			switch ($join->type()) {
@@ -149,7 +149,7 @@ class SelectSqlGenerator
 			$whereClauseGenerator = new WhereClauseGenerator($foreignTable, $join->whereGroups());
 			$whereClause = $whereClauseGenerator->generate("ON");
 		
-			$lines[] = "{$expr} `{$foreignDbName}`.`{$foreignTable->name()}` AS `{$foreignTable->alias()}` {$whereClause}";
+			$lines[] = "{$expr} {$foreignTable->fullName(true)} AS `{$foreignTable->alias()}` {$whereClause}";
 		}
 		
 		return implode("\n", $lines);
