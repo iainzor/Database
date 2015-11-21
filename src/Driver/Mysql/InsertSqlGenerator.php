@@ -103,9 +103,11 @@ class InsertSqlGenerator
 	private function columns()
 	{
 		$columns = [];
+		$structure = $this->query->table()->structure();
+		
 		foreach ($this->query->rows() as $row) {
 			foreach ($row->columns() as $column) {
-				if (!in_array($column->name(), $columns)) {
+				if (!in_array($column->name(), $columns) && $structure->isColumn($column->name())) {
 					$columns[] = $column->name();
 				}
 			}

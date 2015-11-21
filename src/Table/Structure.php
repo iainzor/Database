@@ -60,6 +60,21 @@ class Structure
 	}
 	
 	/**
+	 * Check if a column exists in the structure.  If no columns
+	 * have been defined, this method will always return TRUE
+	 * 
+	 * @param string $name
+	 * @return boolean
+	 */
+	public function isColumn($name)
+	{
+		if (count($this->columns) === 0) {
+			return true;
+		}
+		return isset($this->columns[$name]) ? true : false;
+	}
+	
+	/**
 	 * Parse a single row according to the defined structure
 	 * 
 	 * @param array|object $row
