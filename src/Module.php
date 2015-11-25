@@ -10,11 +10,20 @@ class Module extends AbstractModule
 	 */
 	private $registry;
 	
-	public function init()
+	/**
+	 * Get the database's connection registry
+	 * 
+	 * @return Registry
+	 */
+	public function registry()
 	{
-		$this->registry = new Registry();
+		if (!isset($this->registry)) {
+			$this->registry = new Registry();
 		
-		Table\AbstractTable::dbRegistry($this->registry);
+			Table\AbstractTable::dbRegistry($this->registry);
+		}
+		
+		return $this->registry;
 	}
 	
 	/**
@@ -25,7 +34,7 @@ class Module extends AbstractModule
 	public function connections(array $connections) 
 	{
 		foreach ($connections as $name => $connection) {
-			$this->registry->set($name, $connection);
+			$this->registry()->set($name, $connection);
 		}
 	}
 	
@@ -39,7 +48,7 @@ class Module extends AbstractModule
 	{
 		$this->app->log("Getting database connection for '{$name}'");
 		
-		return $this->registry->get($name);
+		return $this->registry()->get($name);
 	}
 	
 	/**
@@ -51,8 +60,8 @@ class Module extends AbstractModule
 	public function defaultConnection(array $config = null)
 	{
 		if ($config !== null) {
-			$this->registry->defaultConnection($config);
+			$this->registry()->defaultConnection($config);
 		}
-		return $this->registry->defaultConnection();
+		return $this->registry()->defaultConnection();
 	}
 }
