@@ -3,7 +3,8 @@ namespace Database\Relation;
 
 use Database\Table\AbstractTable,
 	Database\Query\SelectQuery,
-	Database\Reference;
+	Database\Reference,
+	Database\Model\AbstractModel;
 
 abstract class AbstractRelation
 {
@@ -169,8 +170,8 @@ abstract class AbstractRelation
 	/**
 	 * Find all related items matching a set of rows
 	 * 
-	 * @param array $rows
-	 * @return array
+	 * @param AbstractModel[] $rows
+	 * @return AbstractModel[]
 	 */
 	public function findAll(array $rows)
 	{
@@ -179,9 +180,10 @@ abstract class AbstractRelation
 		foreach ($rows as $row) {
 			foreach ($this->localKeys as $i => $localKey) {
 				$foreignKey = $this->foreignKeys[$i];
+				$localValue = $row->getSet($localKey);
 				
-				if (!empty($row[$localKey])) {
-					$params[$foreignKey][] = $row[$localKey];
+				if (!empty($localValue)) {
+					$params[$foreignKey][] = $localValue;
 				}
 			}
 		}
@@ -201,17 +203,16 @@ abstract class AbstractRelation
 	 * @param array $foreignRow
 	 * @return boolean
 	 */
-	protected function rowsMatch(array $localRow, array $foreignRow)
+	protected function rowsMatch(AbstractModel $localRow, AbstractModel $foreignRow)
 	{
 		$matched = 0;
 		foreach ($this->localKeys as $i => $localKey) {
 			$foreignKey = $this->foreignKeys[$i];
+			$foreignValue = $foreignRow->getSet($foreignKey);
+			$localValue = $localRow->getSet($localKey);
 			
-			if (isset($localRow[$localKey], $foreignRow[$foreignKey])) {
-				$localValue = $localRow[$localKey];
-				$foreignValue = $foreignRow[$foreignKey];
-				
-				if ($localValue === $foreignValue) {
+			if (!empty($foreignValue) && !empty($localValue)) {
+				if ($localValue == $foreignValue) {
 					$matched++; 
 				}
 			}
@@ -220,5 +221,5 @@ abstract class AbstractRelation
 		return $matched === count($this->localKeys);
 	}
 	
-	abstract public function assignResults($assignAs, array $foreignRows, array &$localRows);
+	abstract public function assignResults($assignAs, array $foreignRows, array $localRows);
 }

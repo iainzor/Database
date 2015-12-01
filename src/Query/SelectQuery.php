@@ -1,7 +1,9 @@
 <?php
 namespace Database\Query;
 
-use Database\PDO;
+use Database\PDO,
+	Database\Model\ModelGeneratorInterface,
+	Database\Model\GenericModel;
 
 class SelectQuery extends AbstractQuery
 {
@@ -111,11 +113,18 @@ class SelectQuery extends AbstractQuery
 	private function _parseResults(array $results)
 	{
 		$map = $this->relationMap();
-		//$structure = $this->table()->structure();
-		//$results = $structure->parseRowset($results, $map);
-		$results = $map->applyToRowset($results);
+		$table = $this->table();
 		
-		//var_dump($results);
+		foreach ($results as $i => $result) {
+			if ($table instanceof ModelGeneratorInterface) {
+				$results[$i] = $table->generateModel($result);
+			} else {
+				$model = new GenericModel($table->alias());
+				$results[$i] = GenericModel::populate($model, $result);
+			}
+		}
+		
+		$results = $map->applyToRowset($results);
 		
 		return $results;
 	}
