@@ -1,7 +1,8 @@
 <?php
 namespace Database\Query;
 
-use Database\Table\Row;
+use Database\Table\Row,
+	Database\Model\AbstractModel;
 
 class InsertQuery extends AbstractQuery
 {
@@ -28,16 +29,22 @@ class InsertQuery extends AbstractQuery
 	/**
 	 * Add a row to be inserted
 	 * 
-	 * @param array|Row $row
+	 * @param mixed $data
 	 */
-	public function addRow($row)
+	public function addRow($data)
 	{
-		if (is_array($row)) {
-			$row = new Row($row);
+		if (is_array($data)) {
+			$row = new Row(
+				$this->generateModel($data)
+			);
+		} else if ($data instanceof AbstractModel) {
+			$row = new Row($data);
+		} else if ($data instanceof Row) {
+			$row = $data;
 		}
 		
-		if (!($row instanceof Row)) {
-			throw new \Exception("Row must be an array of data or an instance of \\Database\\Table\\Row");
+		if (!isset($row)) {
+			throw new \Exception("No valid row data was provided.");
 		}
 		
 		$this->rows[] = $row;
@@ -82,7 +89,7 @@ class InsertQuery extends AbstractQuery
 	/**
 	 * Execute the insert query and return the last inserted ID
 	 * 
-	 * @return mixed
+	 * @return \Database\Model\AbstractModel[]
 	 */
 	public function execute()
 	{
@@ -90,7 +97,15 @@ class InsertQuery extends AbstractQuery
 		$sql = $factory->sqlGenerator()->generate($this);
 		
 		$this->db()->exec($sql);
+		$lastId = $this->db()->lastInsertId();
+		$results = [];
 		
-		return $this->db()->lastInsertId();
+		foreach ($this->rows as $row) {
+			$model = $row->data();
+			$model->id($lastId);
+			$results[] = $model;
+		}
+		
+		return $results;
 	}
 }

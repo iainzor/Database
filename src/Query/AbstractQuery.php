@@ -2,7 +2,8 @@
 namespace Database\Query;
 
 use Database\Table,
-	Database\PDO;
+	Database\PDO,
+	Database\Model;
 
 abstract class AbstractQuery implements QueryInterface
 {
@@ -86,6 +87,28 @@ abstract class AbstractQuery implements QueryInterface
 		$driverFactory = $this->db()->driverFactory();
 		if ($driverFactory) {
 			return $driverFactory->sqlGenerator()->generate($this);
+		}
+	}
+	
+	/**
+	 * Generate a new model instance from a single row of data
+	 * 
+	 * @param array $data
+	 * @return Model\AbstractModel
+	 */
+	public function generateModel(array $data)
+	{
+		$table = $this->table();
+		
+		if (!$table) {
+			throw new \Exception("Cannot generate a model without a table instance");
+		}
+
+		if ($table instanceof Model\ModelGeneratorInterface) {
+			return $table->generateModel($data);
+		} else {
+			$model = new Model\GenericModel($table->alias());
+			return Model\GenericModel::populate($model, $data);
 		}
 	}
 }

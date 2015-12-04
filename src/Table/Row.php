@@ -1,6 +1,8 @@
 <?php
 namespace Database\Table;
 
+use Database\Model\AbstractModel;
+
 class Row
 {
 	/**
@@ -16,29 +18,31 @@ class Row
 	/**
 	 * Constructor
 	 * 
-	 * @param array $data
+	 * @param array|AbstractModel $data
 	 */
-	public function __construct(array $data)
+	public function __construct($data)
 	{
 		$this->data($data);
 	}
 	
 	/**
-	 * Get or set the values in the row
+	 * Get or set the row's data model
 	 * 
-	 * @param array $data
-	 * @return array
+	 * @param AbstractModel $data
+	 * @return AbstractModel
 	 */
-	public function data(array $data = null)
+	public function data(AbstractModel $data = null)
 	{
 		if ($data !== null) {
 			$this->columns = [];
 			$this->data = $data;
+			$keys = array_keys($data->toBasicArray());
 
-			foreach ($data as $name => $value) {
-				$this->columns[] = new Column($name);
+			foreach ($keys as $key) {
+				$this->columns[] = new Column($key);
 			}
 		}
+		
 		return $this->data;
 	}
 	
@@ -61,6 +65,7 @@ class Row
 	 */
 	public function value($column, $defaultValue = null)
 	{
-		return isset($this->data[$column]) ? $this->data[$column] : $defaultValue;
+		$value = $this->data->getSet($column);
+		return empty($value) ? $defaultValue : $value;
 	}
 }

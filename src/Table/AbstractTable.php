@@ -4,7 +4,8 @@ namespace Database\Table;
 use Database\PDO,
 	Database\Query,
 	Database\Registry,
-	Database\Config;
+	Database\Config,
+	Database\Model\AbstractModel;
 
 abstract class AbstractTable
 {
@@ -214,18 +215,20 @@ abstract class AbstractTable
 	}
 	
 	/**
-	 * Insert a row into the table and return the new row's primary key
+	 * Insert a row into the table and return its model with its ID assigned
 	 * 
-	 * @param array $row
-	 * @return mixed
+	 * @param array|AbstractModel $model
+	 * @param array $updateColumns If not empty, the query will update these columns if a unique conflict arises
+	 * @return \Database\Model\AbstractModel
 	 */
-	public function insert(array $row)
+	public function insert($model, array $updateColumns = [])
 	{
 		$query = new Query\InsertQuery($this->db());
 		$query->into($this);
-		$query->addRow($row);
+		$query->addRow($model);
+		$query->onDuplicateKeyUpdate($updateColumns);
 		
-		return $query->execute();
+		return $query->execute()[0];
 	}
 	
 	/**

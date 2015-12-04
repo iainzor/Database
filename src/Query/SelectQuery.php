@@ -110,18 +110,19 @@ class SelectQuery extends AbstractQuery
 		return null;
 	}
 	
+	/**
+	 * Parse the results and apply any relations to them
+	 * 
+	 * @param array $results
+	 * @return \Database\Model\AbstractModel[]
+	 */
 	private function _parseResults(array $results)
 	{
 		$map = $this->relationMap();
 		$table = $this->table();
 		
 		foreach ($results as $i => $result) {
-			if ($table instanceof ModelGeneratorInterface) {
-				$results[$i] = $table->generateModel($result);
-			} else {
-				$model = new GenericModel($table->alias());
-				$results[$i] = GenericModel::populate($model, $result);
-			}
+			$results[$i] = $this->generateModel($result);
 		}
 		
 		$results = $map->applyToRowset($results);

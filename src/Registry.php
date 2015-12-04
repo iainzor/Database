@@ -14,6 +14,25 @@ class Registry
 	private $defaultConnection;
 	
 	/**
+	 * @var string
+	 */
+	private $defaultCharset = "utf8";
+	
+	/**
+	 * Get or set the default charset to use for connections
+	 * 
+	 * @param string $charset
+	 * @return string
+	 */
+	public function defaultCharset($charset = null)
+	{
+		if ($charset !== null) {
+			$this->defaultCharset = $charset;
+		}
+		return $this->defaultCharset;
+	}
+	
+	/**
 	 * Set a PDO connection
 	 * 
 	 * @param string $name
@@ -96,8 +115,13 @@ class Registry
 			if (!isset($config[Config::CONF_DSN])) {
 				throw new \Exception("No DSN value provided in connection configuration");
 			}
-
-			$connection = new PDO($config[Config::CONF_DSN], $config[Config::CONF_USER], $config[Config::CONF_PASSWORD], $options);
+			
+			$dsn = $config[Config::CONF_DSN];
+			if (!preg_match("/charset=[^;]+/i", $dsn)) {
+				$dsn = rtrim($dsn, ";") .";charset=". $this->defaultCharset;
+			}
+			
+			$connection = new PDO($dsn, $config[Config::CONF_USER], $config[Config::CONF_PASSWORD], $options);
 			$this->connections[$name] = $connection;
 		} else if ($config instanceof PDO) {
 			$connection = $config;
