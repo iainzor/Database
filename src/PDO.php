@@ -177,14 +177,26 @@ class PDO extends \PDO
 	 */
 	public function exec($statement) 
 	{
+		$exception = false;
 		$startTime = microtime(true);
-		$result = parent::exec($statement);
-		$totalTime = microtime(true) - $startTime;
-		
-		$this->logs[] = [
-			"sql" => $statement,
-			"totalTime" => $totalTime
+		$log = [
+			"sql" => $statement
 		];
+		
+		try {
+			$result = parent::exec($statement);
+		} catch (\PDOException $e) {
+			$log["error"] = $e->getMessage();
+			$exception = $e;
+		}
+		
+		$log["totalTime"] = microtime(true) - $startTime;
+		
+		$this->logs[] = $log;
+		
+		if ($exception !== false) {
+			throw $exception;
+		}
 		
 		return $result;
 	}
