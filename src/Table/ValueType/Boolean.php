@@ -1,7 +1,7 @@
 <?php
 namespace Database\Table\ValueType;
 
-class BooleanType implements TypeInterface
+class Boolean implements TypeInterface
 {
 	/**
 	 * Parse a value as a boolean

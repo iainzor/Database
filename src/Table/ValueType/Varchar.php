@@ -1,7 +1,7 @@
 <?php
 namespace Database\Table\ValueType;
 
-class IntType implements TypeInterface
+class Varchar implements TypeInterface
 {
 	/**
 	 * Parse a value as a varchar
@@ -12,6 +12,9 @@ class IntType implements TypeInterface
 	 */
 	public function parseValue($value, $length = null) 
 	{
-		return (int) $value;
+		if ($length !== null) {
+			return substr($value, 0, $length);
+		}
+		return $value;
 	}
 }

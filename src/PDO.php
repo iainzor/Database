@@ -21,7 +21,7 @@ class PDO extends \PDO
 	/**
 	 * @var Table\Structure[]
 	 */
-	private $tables;
+	private $tables = [];
 	
 	/**
 	 * Overrides the default constructor to keep track of the driver being used
@@ -239,10 +239,16 @@ class PDO extends \PDO
 	public function describe($table)
 	{
 		$table = Table\AbstractTable::factory($table, $this);
-		$structure = new Table\Structure();
-		$factory = $this->driverFactory();
-		$factory->populateStructure($structure, $table->name());
+		$tableName = $table->name();
 		
-		return $structure;
+		if (!isset($this->tables[$tableName])) {
+			$structure = new Table\Structure();
+			$factory = $this->driverFactory();
+			$factory->populateStructure($this, $table, $structure);
+		
+			$this->tables[$tableName] = $structure;
+		}
+		
+		return $this->tables[$tableName];
 	}
 }

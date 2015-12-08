@@ -243,7 +243,7 @@ abstract class AbstractTable
 	 * 
 	 * @param mixed $where
 	 * @param array $params
-	 * @return array
+	 * @return \Database\Model\AbstractModel
 	 */
 	public function find($where, array $params = [])
 	{
