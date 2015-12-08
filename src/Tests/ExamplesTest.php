@@ -54,6 +54,6 @@ class ExamplesTest extends \PHPUnit_Framework_TestCase
 		
 		$iainzor = $players[0];
 		
-		$this->assertEquals("iain.zor", $iainzor->name);
+		$this->assertEquals("iain.zor", $iainzor->name());
 	}
 }

@@ -54,9 +54,9 @@ class RelationTest extends \PHPUnit_Framework_TestCase
 		$this->assertNotEmpty($players);
 		
 		foreach ($players as $player) {
-			$this->assertNotNull($player["server"]);
-			$this->assertEquals($player["serverId"], $player["server"]["id"]);
-			$this->assertNotNull($player["server"]["game"]);
+			$this->assertNotNull($player->server());
+			$this->assertEquals($player->serverId(), $player->server()->id());
+			$this->assertNotNull($player->server()->game());
 		}
 	}
 }

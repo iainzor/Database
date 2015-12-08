@@ -18,6 +18,7 @@ class GenericTable extends AbstractTable
 		parent::__construct($db);
 		
 		$this->_name = $name;
+		$this->structure(new Structure());
 	}
 	
 	/**

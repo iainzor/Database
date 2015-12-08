@@ -3,7 +3,8 @@ namespace Database\Query;
 
 use Database\Table,
 	Database\PDO,
-	Database\Model;
+	Database\Model,
+	Bliss\Component;
 
 abstract class AbstractQuery implements QueryInterface
 {
@@ -44,29 +45,14 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * Get or set the table to run the query on
 	 * 
-	 * @param mixed $table	This can either be a string of the table's name, an array as [tableName, tableAlias] 
-	 *						or an instance of \Database\Table\AbstractTable
+	 * @param mixed $table
 	 * @return \Database\Table\AbstractTable
+	 * @see \Database\Table\AbstractTable::factory()
 	 */
 	public function table($table = null)
 	{
 		if ($table !== null) {
-			if ($table instanceof Table\AbstractTable) {
-				$this->table = $table;
-			} else if (is_string($table)) {
-				$this->table = new Table\GenericTable($table, $this->db());
-			} else if (is_array($table)) {
-				$tableName = $table[0];
-				$tableAlias = isset($table[1]) ? $table[1] : null;
-				$this->table = new Table\GenericTable($tableName, $this->db());
-				$this->table->alias($tableAlias);
-			} else {
-				throw new \InvalidArgumentException("Could not create table instance from passed value");
-			}
-			
-			if (!$this->table->db()) {
-				$this->table->db($this->db());
-			}
+			$this->table = Table\AbstractTable::factory($table, $this->db);
 		}
 		
 		return $this->table;
@@ -93,12 +79,13 @@ abstract class AbstractQuery implements QueryInterface
 	/**
 	 * Generate a new model instance from a single row of data
 	 * 
-	 * @param array $data
+	 * @param array|Model\AbstractModel $data
 	 * @return Model\AbstractModel
 	 */
-	public function generateModel(array $data)
+	public function generateModel($data)
 	{
 		$table = $this->table();
+		$data = Component::convertValueToArray($data);
 		
 		if (!$table) {
 			throw new \Exception("Cannot generate a model without a table instance");

@@ -3,7 +3,9 @@ namespace Database\Tests\Driver\Mysql;
 
 use Database\Driver\Mysql\DriverFactory,
 	Database\Query,
-	Database\Tests\TestDb;
+	Database\Tests\TestDb,
+	Database\Tests\MockTable,
+	Database\Table\Structure;
 
 class SqlGeneratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,7 +32,8 @@ class SqlGeneratorTest extends \PHPUnit_Framework_TestCase
 		$factory = new DriverFactory();
 		$db = TestDb::pdo();
 		$query = new Query\InsertQuery($db);
-		$query->into("my_table");
+		$table = MockTable::factory($db);
+		$query->into($table);
 		$query->rows([
 			[
 				"foo" => "bar",

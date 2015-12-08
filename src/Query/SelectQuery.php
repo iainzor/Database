@@ -63,7 +63,7 @@ class SelectQuery extends AbstractQuery
 	 * 
 	 * @param array $params
 	 * @param int $fetchStyle
-	 * @return array
+	 * @return \Database\Model\AbstractModel[]
 	 */
 	public function fetchAll(array $params = [], $fetchStyle = PDO::FETCH_ASSOC)
 	{
@@ -78,7 +78,7 @@ class SelectQuery extends AbstractQuery
 	 * 
 	 * @param array $params
 	 * @param int $fetchStyle
-	 * @return mixed
+	 * @return \Database\Model\AbstractModel
 	 */
 	public function fetchRow(array $params = [], $fetchStyle = PDO::FETCH_ASSOC)
 	{
@@ -119,14 +119,11 @@ class SelectQuery extends AbstractQuery
 	private function _parseResults(array $results)
 	{
 		$map = $this->relationMap();
-		$table = $this->table();
 		
 		foreach ($results as $i => $result) {
 			$results[$i] = $this->generateModel($result);
 		}
 		
-		$results = $map->applyToRowset($results);
-		
-		return $results;
+		return $map->applyToRowset($results);
 	}
 }

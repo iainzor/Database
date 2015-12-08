@@ -43,7 +43,6 @@ class SelectSqlGenerator
 		$parts = [
 			"SELECT",
 			$this->columnList(),
-			//"FROM {$dbName}`{$table->name()}` AS `{$table->alias()}`",
 			"FROM {$table->fullName(true)} AS `{$table->alias()}`",
 			$this->joinClause(),
 			$whereGenerator->generate(),

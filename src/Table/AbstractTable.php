@@ -48,6 +48,39 @@ abstract class AbstractTable
 	{
 		self::$dbRegistry = $registry;
 	}
+	
+	/**
+	 * Generate a new AbstractTable instance using a mixed value
+	 * 
+	 * Possible values are an instance of AbstractTable, a string, or an array.  If
+	 * an array is used, it should only contain two items as [$tableName, $tableAlias]
+	 * 
+	 * @param mixed $table
+	 * @param PDO $db
+	 * @return \Database\Table\AbstractTable
+	 * @throws \InvalidArgumentException
+	 */
+	public static function factory($table, PDO $db)
+	{
+		if (is_string($table)) {
+			$table = new GenericTable($table, $db);
+		} else if (is_array($table)) {
+			$tableName = $table[0];
+			$tableAlias = isset($table[1]) ? $table[1] : null;
+			$table = new GenericTable($tableName, $db);
+			$table->alias($tableAlias);
+		}
+		
+		if (!$table instanceof AbstractTable) {
+			throw new \InvalidArgumentException("Could not create table instance from passed value");
+		}
+
+		if (!$table->db()) {
+			$table->db($this->db());
+		}
+		
+		return $table;
+	}
 
 	/**
 	 * @return string
@@ -65,8 +98,8 @@ abstract class AbstractTable
 			$this->db = $db;
 		}
 		
-		$this->structure = new Structure();
 		if ($this instanceof StructureProviderInterface) {
+			$this->structure = new Structure();
 			$this->initStructure($this->structure);
 		}
 	}
@@ -159,6 +192,9 @@ abstract class AbstractTable
 	/**
 	 * Get or set the table's structure 
 	 * 
+	 * If a structure has not been defined, one will be generated using the 
+	 * description of the table from the database
+	 * 
 	 * @param Structure $structure
 	 * @return Structure
 	 */
@@ -166,6 +202,9 @@ abstract class AbstractTable
 	{
 		if ($structure !== null) {
 			$this->structure = $structure;
+		}
+		if (!$this->structure) {
+			$this->structure = $this->db()->describe($this);
 		}
 		return $this->structure;
 	}
@@ -180,7 +219,7 @@ abstract class AbstractTable
 	 */
 	public function column($name, array $config = null)
 	{
-		$column = $this->structure->column($name, $config);
+		$column = $this->structure()->column($name, $config);
 		$column->table($this);
 		
 		return $column;

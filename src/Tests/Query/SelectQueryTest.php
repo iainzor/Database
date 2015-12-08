@@ -108,10 +108,12 @@ class SelectQueryTest extends \PHPUnit_Framework_Testcase
 		$serverQuery->hasOne("game", $gameTable, "gameId", "id");
 		
 		$server = $serverQuery->fetchRow();
+		$game = $server->getSet("game");
+		
 		
 		//print_r($server);
 		
 		//$this->assertTrue(isset($server["serverId"]));
-		$this->assertTrue(isset($server["game"]));
+		$this->assertTrue(isset($game));
 	}
 }

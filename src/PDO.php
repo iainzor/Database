@@ -19,6 +19,11 @@ class PDO extends \PDO
 	private $driver;
 	
 	/**
+	 * @var Table\Structure[]
+	 */
+	private $tables;
+	
+	/**
 	 * Overrides the default constructor to keep track of the driver being used
 	 * 
 	 * @param string $dsn
@@ -195,6 +200,12 @@ class PDO extends \PDO
 	{
 		$startTime = microtime(true);
 		$statement = $this->prepare($sql);
+		
+		if (!$statement) {
+			$errorInfo = $this->errorInfo();
+			throw new \Exception("Could not prepare statement: {$errorInfo[2]}");
+		}
+		
 		$statement->execute($params);
 		$totalTime = microtime(true) - $startTime;
 		
@@ -205,5 +216,21 @@ class PDO extends \PDO
 		];
 		
 		return $statement;
+	}
+	
+	/**
+	 * Get the structure of a table
+	 * 
+	 * @param mixed $table
+	 * @return \Database\Table\Structure
+	 */
+	public function describe($table)
+	{
+		$table = Table\AbstractTable::factory($table, $this);
+		$structure = new Table\Structure();
+		$factory = $this->driverFactory();
+		$factory->populateStructure($structure, $table->name());
+		
+		return $structure;
 	}
 }
