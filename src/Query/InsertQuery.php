@@ -97,15 +97,49 @@ class InsertQuery extends AbstractQuery
 		$sql = $factory->sqlGenerator()->generate($this);
 		
 		$this->db()->exec($sql);
-		$lastId = $this->db()->lastInsertId();
-		$results = [];
+		$this->_updateInsertedRows($this->db()->lastInsertId(), $this->rows);
 		
+		$results = [];
 		foreach ($this->rows as $row) {
 			$model = $row->data();
-			$model->id($lastId);
 			$results[] = $model;
 		}
 		
 		return $results;
+	}
+	
+	/**
+	 * Update the IDs of newly inserted rows
+	 * 
+	 * @param int $lastId
+	 * @param \Database\Table\Row[] $rows
+	 */
+	private function _updateInsertedRows($lastId, array $rows)
+	{
+		if (count($rows) === 1) {
+			$rows[0]->data()->id($lastId);
+		} else if (count($rows) > 1) {
+			$table = $this->table();
+			$structure = $table->structure();
+
+			if ($structure->isColumn("id")) {
+				$query = new SelectQuery($this->db());
+				$query->from($this->table());
+				$query->columns(["id"]);
+				$query->limit(count($rows));
+				$query->orderBy("id")->asc();
+				$query->where("id >= :lastId");
+				
+				$lastResults = $query->fetchAll([
+					":lastId" => $lastId
+				]);
+				
+				foreach ($lastResults as $i => $result) {
+					if (isset($rows[$i])) {
+						$rows[$i]->data()->id($result->id());
+					}
+				}
+			}
+		}
 	}
 }
