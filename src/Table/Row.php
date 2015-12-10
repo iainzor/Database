@@ -6,9 +6,9 @@ use Database\Model\AbstractModel;
 class Row
 {
 	/**
-	 * @var array
+	 * @var AbstractModel
 	 */
-	private $data = [];
+	private $data;
 	
 	/**
 	 * @var Column[]
@@ -18,7 +18,7 @@ class Row
 	/**
 	 * Constructor
 	 * 
-	 * @param array|AbstractModel $data
+	 * @param AbstractModel $data
 	 */
 	public function __construct($data)
 	{
@@ -65,7 +65,6 @@ class Row
 	 */
 	public function value($column, $defaultValue = null)
 	{
-		$value = $this->data->getSet($column);
-		return empty($value) ? $defaultValue : $value;
+		return $this->data->getSet($column);
 	}
 }
