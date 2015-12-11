@@ -3,6 +3,8 @@ namespace Database\Model;
 
 trait ModelGeneratorTrait
 {
+	abstract public function createModelInstance();
+	
 	/**
 	 * Generate a model for the table using a set of properties
 	 * 
