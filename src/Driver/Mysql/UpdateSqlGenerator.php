@@ -63,9 +63,12 @@ class UpdateSqlGenerator
 	{
 		$sets = [];
 		$db = $this->query->db();
+		$structure = $this->query->table()->structure();
 		
 		foreach ($values as $name => $value) {
-			$sets[] = "`{$name}` = ". $db->quote($value);
+			if ($structure->isColumn($name)) {
+				$sets[] = "`{$name}` = ". $db->quote($value);
+			}
 		}
 		
 		return "SET ". implode(", ", $sets);
