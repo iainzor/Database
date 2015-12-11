@@ -79,12 +79,13 @@ class InsertSqlGenerator
 			$r = [];
 			foreach ($columns as $columnName) {
 				$value = $row->value($columnName);
-				if ($value !== null) {
-					$value = $db->quote($value);
-				} else if ($value === true || $value === false) {
+				
+				if ($value === true || $value === false) {
 					$value = (int) $value;
 				} else if ($value === null) {
 					$value = "NULL";
+				} else {
+					$value = $db->quote($value);
 				}
 				
 				$r[] = $value;
