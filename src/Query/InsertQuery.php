@@ -93,19 +93,23 @@ class InsertQuery extends AbstractQuery
 	 */
 	public function execute()
 	{
-		$factory = $this->db()->driverFactory();
-		$sql = $factory->sqlGenerator()->generate($this);
-		
-		$this->db()->exec($sql);
-		$this->_updateInsertedRows($this->db()->lastInsertId(), $this->rows);
-		
-		$results = [];
-		foreach ($this->rows as $row) {
-			$model = $row->data();
-			$results[] = $model;
+		if (count($this->rows) > 0) {
+			$factory = $this->db()->driverFactory();
+			$sql = $factory->sqlGenerator()->generate($this);
+
+			$this->db()->exec($sql);
+			$this->_updateInsertedRows($this->db()->lastInsertId(), $this->rows);
+
+			$results = [];
+			foreach ($this->rows as $row) {
+				$model = $row->data();
+				$results[] = $model;
+			}
+
+			return $results;
+		} else {
+			return [];
 		}
-		
-		return $results;
 	}
 	
 	/**
