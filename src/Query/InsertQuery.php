@@ -120,9 +120,14 @@ class InsertQuery extends AbstractQuery
 	 */
 	private function _updateInsertedRows($lastId, array $rows)
 	{
-		if (count($rows) === 1) {
-			$rows[0]->data()->id($lastId);
-		} else if (count($rows) > 1) {
+		$needIds = [];
+		foreach ($rows as $row) {
+			if (!$row->data()->id()) {
+				$needIds[] = $row->data();
+			}
+		}
+		
+		if (count($needIds) > 0) {
 			$table = $this->table();
 			$structure = $table->structure();
 
@@ -130,7 +135,7 @@ class InsertQuery extends AbstractQuery
 				$query = new SelectQuery($this->db());
 				$query->from($this->table());
 				$query->columns(["id"]);
-				$query->limit(count($rows));
+				$query->limit(count($needIds));
 				$query->orderBy("id")->asc();
 				$query->where("id >= :lastId");
 				
@@ -139,8 +144,8 @@ class InsertQuery extends AbstractQuery
 				]);
 				
 				foreach ($lastResults as $i => $result) {
-					if (isset($rows[$i])) {
-						$rows[$i]->data()->id($result->id());
+					if (isset($needIds[$i])) {
+						$needIds[$i]->id($result->id());
 					}
 				}
 			}
