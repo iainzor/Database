@@ -52,10 +52,10 @@ class Module extends AbstractModule
 	}
 	
 	/**
-	 * Get or set the default database connection configuration
+	 * Get or set the default database connection
 	 * 
 	 * @param array $config
-	 * @return array
+	 * @return PDO
 	 */
 	public function defaultConnection(array $config = null)
 	{
