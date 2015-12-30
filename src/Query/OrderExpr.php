@@ -1,7 +1,8 @@
 <?php
 namespace Database\Query;
 
-use Database\Table\Column;
+use Database\Table\Column,
+	Database\Table\ColumnExpr;
 
 class OrderExpr
 {
@@ -11,7 +12,7 @@ class OrderExpr
 	private $query;
 	
 	/**
-	 * @var Column
+	 * @var ColumnExpr
 	 */
 	private $column;
 	
@@ -24,7 +25,7 @@ class OrderExpr
 	 * Constructor
 	 * 
 	 * @param \Database\Query\AbstractQuery $query
-	 * @param string|Column $column
+	 * @param string|Column|ColumnExpr $column
 	 */
 	public function __construct(AbstractQuery $query, $column)
 	{
@@ -36,22 +37,27 @@ class OrderExpr
 	/**
 	 * Get or set the column to be ordered
 	 * 
-	 * @param string|Column $column
-	 * @return Column
+	 * @param string|Column|ColumnExpr $column
+	 * @return ColumnExpr
 	 * @throws \UnexpectedValueException
 	 */
 	public function column($column = null)
 	{
 		if ($column !== null) {
 			if (is_string($column)) {
-				$column = new Column($column, $this->query->table());
+				$expr = new ColumnExpr($column);
+			} else if ($column instanceof Column) {
+				$table = $column->table() ?: $this->query->table();
+				$expr = new ColumnExpr($table->alias().".".$column->name());
+			} else if ($column instanceof ColumnExpr) {
+				$expr = $column;
 			}
 			
-			if (!($column instanceof Column)) {
-				throw new \UnexpectedValueException("Column must be a name of a column or instance of \\Database\\Table\\Column");
+			if (!isset($expr)) {
+				throw new \UnexpectedValueException("Unexpected column value provided for the order expression");
 			}
 			
-			$this->column = $column;
+			$this->column = $expr;
 		}
 		return $this->column;
 	}

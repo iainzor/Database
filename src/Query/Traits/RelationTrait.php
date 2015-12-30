@@ -34,10 +34,11 @@ trait RelationTrait
 	 * @param mixed $reference
 	 * @param array|string $localKeys
 	 * @param array|string $foreignKeys
+	 * @return \Database\Relation\OneToOneRelation
 	 */
 	public function hasOne($name, $reference, $localKeys, $foreignKeys)
 	{
-		$this->relationMap()->hasOne($name, $reference, $localKeys, $foreignKeys);
+		return $this->relationMap()->hasOne($name, $reference, $localKeys, $foreignKeys);
 	}
 	
 	/**
@@ -47,9 +48,10 @@ trait RelationTrait
 	 * @param mixed $reference
 	 * @param array|string $localKeys
 	 * @param array|string $foreignKeys
+	 * @return \Database\Relation\OneToManyRelation
 	 */
 	public function hasMany($name, $reference, $localKeys, $foreignKeys)
 	{
-		$this->relationMap()->hasMany($name, $reference, $localKeys, $foreignKeys);
+		return $this->relationMap()->hasMany($name, $reference, $localKeys, $foreignKeys);
 	}
 }

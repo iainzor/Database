@@ -2,7 +2,8 @@
 namespace Database\Driver\Mysql;
 
 use Database\Table\AbstractTable,
-	Database\Query\AbstractQuery;
+	Database\Query\AbstractQuery,
+	Database\Query\OrderExpr;
 
 class OrderClauseGenerator
 {
@@ -12,7 +13,7 @@ class OrderClauseGenerator
 	private $table;
 	
 	/**
-	 * @var array
+	 * @var OrderExpr[]
 	 */
 	private $orderings = [];
 	
@@ -38,7 +39,6 @@ class OrderClauseGenerator
 		$parts = [];
 		foreach ($this->orderings as $expr) {
 			$column = $expr->column();
-			$table = $column->table();
 			
 			switch ($expr->direction()) {
 				case AbstractQuery::SORT_DESC:
@@ -50,7 +50,7 @@ class OrderClauseGenerator
 					break;
 			}
 			
-			$parts[] = sprintf("`%s`.`%s` %s", $table->alias(), $column->name(), $dir);
+			$parts[] = sprintf("%s %s", $column->expr(), $dir);
 		}
 		
 		return count($parts) ? "ORDER BY ". implode(", ", $parts) : null;

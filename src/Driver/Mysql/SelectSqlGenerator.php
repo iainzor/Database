@@ -3,7 +3,9 @@ namespace Database\Driver\Mysql;
 
 use Database\Query\SelectQuery,
 	Database\Table\AbstractTable,
-	Database\Table\ColumnExpr;
+	Database\Table\VirtualTable,
+	Database\Table\ColumnExpr,
+	Database\Table\Column;
 
 class SelectSqlGenerator
 {
@@ -123,13 +125,25 @@ class SelectSqlGenerator
 			$localTable = empty($join->localTable()) ? $this->query->table() : $join->localTable();
 			$localKeys = $join->localKeys();
 			$conditions = [];
+			$isVirtual = $foreignTable instanceof VirtualTable;
 			
 			foreach ($foreignKeys as $i => $foreignKey) {
 				if (!isset($localKeys[$i])) {
 					continue;
 				}
+				
 				$localKey = $localKeys[$i];
-				$join->where("{$localTable->fullName(true)}.`{$localKey}` = {$foreignTable->fullName(true)}.`{$foreignKey}`");
+				if ($localKey instanceof Column) {
+					$localTable = $localKey->table();
+					$localKey = $localKey->name();
+				}
+				
+				$foreignPath = $foreignTable->fullName(true) .".`{$foreignKey}`";
+				if ($foreignTable->name() !== $foreignTable->alias() || $isVirtual) {
+					$foreignPath = "`{$foreignTable->alias()}`.`{$foreignKey}`";
+				}
+				
+				$join->where("{$localTable->fullName(true)}.`{$localKey}` = {$foreignPath}");
 			}
 			
 			switch ($join->type()) {
@@ -147,8 +161,13 @@ class SelectSqlGenerator
 			
 			$whereClauseGenerator = new WhereClauseGenerator($foreignTable, $join->whereGroups());
 			$whereClause = $whereClauseGenerator->generate("ON");
+			$tableExpr = $foreignTable->fullName(true);
+			
+			if ($foreignTable instanceof VirtualTable) {
+				$tableExpr = "(". $foreignTable->query()->generateSql() .")";
+			}
 		
-			$lines[] = "{$expr} {$foreignTable->fullName(true)} AS `{$foreignTable->alias()}` {$whereClause}";
+			$lines[] = "{$expr} {$tableExpr} AS `{$foreignTable->alias()}` {$whereClause}";
 		}
 		
 		return implode("\n", $lines);

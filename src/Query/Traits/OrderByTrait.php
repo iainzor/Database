@@ -14,15 +14,14 @@ trait OrderByTrait
 	/**
 	 * Add a new order expression to the query
 	 * 
-	 * @param string|Column $column
+	 * @param string|Column|ColumnExpr $column
 	 * @return OrderExpr
 	 */
 	public function orderBy($column)
 	{
 		$expr = new OrderExpr($this, $column);
-		$column = $expr->column();
-		$table = $column->table();
-		$key = $table->alias() .".". $column->name();
+		$columnExpr = $expr->column();
+		$key = $columnExpr->expr();
 		
 		$this->orderings[$key] = $expr;
 		

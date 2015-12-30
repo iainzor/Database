@@ -228,12 +228,17 @@ abstract class AbstractTable
 	/**
 	 * Create a new SelectQuery for the table
 	 * 
+	 * @param array $columns Optional column names to retrieve, defaults to all
 	 * @return \Database\Query\SelectQuery
 	 */
-	public function select()
+	public function select(array $columns = null)
 	{
 		$query = new Query\SelectQuery($this->db());
 		$query->from($this);
+		
+		if ($columns !== null) {
+			$query->columns($columns);
+		}
 		
 		return $query;
 	}
