@@ -6,4 +6,6 @@ use Database\Query\AbstractQuery;
 interface SqlGeneratorInterface
 {
 	public function generate(AbstractQuery $query);
+	
+	public function generateFoundRowsSql();
 }

@@ -43,7 +43,7 @@ class SelectSqlGenerator
 		}
 		
 		$parts = [
-			"SELECT",
+			$this->query->calcFoundRows() ? "SELECT SQL_CALC_FOUND_ROWS" : "SELECT",
 			$this->columnList(),
 			"FROM {$table->fullName(true)} AS `{$table->alias()}`",
 			$this->joinClause(),

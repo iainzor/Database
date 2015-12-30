@@ -20,6 +20,11 @@ class SelectQuery extends AbstractQuery
 	private $columns = ["*"];
 	
 	/**
+	 * @var boolean
+	 */
+	private $calcFoundRows = false;
+	
+	/**
 	 * Get or set the columns to select from the base table
 	 * 
 	 * @param array $columns
@@ -56,6 +61,34 @@ class SelectQuery extends AbstractQuery
 		$instance->db($db);
 		
 		$this->relationMap()->table($instance);
+	}
+	
+	/**
+	 * Get or set whether the query should calculate the total number of found rows
+	 * 
+	 * @param boolean $flag
+	 * @return boolean
+	 */
+	public function calcFoundRows($flag = null)
+	{
+		if ($flag !== null) {
+			$this->calcFoundRows = (boolean) $flag;
+		}
+		return $this->calcFoundRows;
+	}
+	
+	/**
+	 * Get the total number of rows found from the last executed query
+	 * 
+	 * @return int
+	 */
+	public function foundRows()
+	{
+		$db = $this->db();
+		$driverFactory = $db->driverFactory();
+		$sql = $driverFactory->sqlGenerator()->generateFoundRowsSql();
+		
+		return (int) $db->fetchColumn($sql);
 	}
 	
 	/**

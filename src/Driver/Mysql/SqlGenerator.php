@@ -32,4 +32,12 @@ class SqlGenerator implements SqlGeneratorInterface
 		
 		throw new \Exception("Could not generate a SQL statement using the query '". get_class($query) ."'");
 	}
+	
+	/**
+	 * @return string
+	 */
+	public function generateFoundRowsSql() 
+	{
+		return "SELECT FOUND_ROWS()";
+	}
 }
