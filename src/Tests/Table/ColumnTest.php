@@ -21,7 +21,7 @@ class ColumnTest extends \PHPUnit_Framework_TestCase
 			"length" => 8
 		]);
 		
-		$this->assertInstanceOf("\\Database\\Table\\ValueType\\VarcharType", $column->type());
+		$this->assertInstanceOf("\\Database\\Table\\ValueType\\Varchar", $column->type());
 		$this->assertEquals(8, strlen($column->parseValue("this is a long column value")));
 	}
 }

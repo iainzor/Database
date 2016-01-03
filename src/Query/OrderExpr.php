@@ -45,10 +45,14 @@ class OrderExpr
 	{
 		if ($column !== null) {
 			if (is_string($column)) {
+				if (preg_match("/^[a-z0-9-_]+$/i", $column)) {
+					$table = $this->query->table();
+					$column = "`{$table->alias()}`.`{$column}`";
+				}
 				$expr = new ColumnExpr($column);
 			} else if ($column instanceof Column) {
 				$table = $column->table() ?: $this->query->table();
-				$expr = new ColumnExpr($table->alias().".".$column->name());
+				$expr = new ColumnExpr("`{$table->alias()}`.`{$column->name()}`");
 			} else if ($column instanceof ColumnExpr) {
 				$expr = $column;
 			}
