@@ -40,6 +40,16 @@ class GroupExpr
 		if ($column !== null) {
 			if (is_string($column)) {
 				$column = new Column($column, $this->query->table());
+			} else if (is_array($column)) {
+				$tableName = array_shift($column);
+				if (count($column) > 0 && $this->query instanceof SelectQuery) {
+					$columnName = array_shift($column);
+					$table = $this->query->findJoinedTable($tableName);
+				} else {
+					$columnName = $tableName;
+					$table = $this->query->table();
+				}
+				$column = new Column($columnName, $table);
 			}
 			
 			if (!($column instanceof Column)) {

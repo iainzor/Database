@@ -23,6 +23,23 @@ trait JoinTrait
 	}
 	
 	/**
+	 * Attempt to find a joined table by its name
+	 * 
+	 * @param string $tableName
+	 * @return AbstractTable
+	 * @throws \Exception
+	 */
+	public function findJoinedTable($tableName)
+	{
+		foreach ($this->joins as $join) {
+			if ($join->foreignTable()->alias() === $tableName) {
+				return $join->foreignTable();
+			}
+		}
+		throw new \Exception("Could not find joined table '{$tableName}'");
+	}
+	
+	/**
 	 * Join a table onto the query
 	 * 
 	 * @param string|array|AbstractTable $foreignTable
