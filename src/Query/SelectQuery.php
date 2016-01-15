@@ -25,6 +25,11 @@ class SelectQuery extends AbstractQuery
 	private $calcFoundRows = false;
 	
 	/**
+	 * @var int
+	 */
+	private $foundRows = 0;
+	
+	/**
 	 * Get or set the columns to select from the base table
 	 * 
 	 * @param array $columns
@@ -127,15 +132,15 @@ class SelectQuery extends AbstractQuery
 	/**
 	 * Get the total number of rows found from the last executed query
 	 * 
+	 * @param int $rows
 	 * @return int
 	 */
-	public function foundRows()
+	public function foundRows($rows = null)
 	{
-		$db = $this->db();
-		$driverFactory = $db->driverFactory();
-		$sql = $driverFactory->sqlGenerator()->generateFoundRowsSql();
-		
-		return (int) $db->fetchColumn($sql);
+		if ($rows !== null) {
+			$this->foundRows = (int) $rows;
+		}
+		return $this->foundRows;
 	}
 	
 	/**
@@ -149,6 +154,14 @@ class SelectQuery extends AbstractQuery
 	{
 		$sql = $this->generateSQL();
 		$results = $this->db()->fetchAll($sql, $params, $fetchStyle);
+		
+		if ($this->calcFoundRows()) {
+			$driverFactory = $this->db()->driverFactory();
+			$sql = $driverFactory->sqlGenerator()->generateFoundRowsSql();
+			$rows = (int) $this->db()->fetchColumn($sql);
+			
+			$this->foundRows($rows);
+		}
 		
 		return $this->_parseResults($results);
 	}
