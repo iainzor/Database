@@ -175,6 +175,7 @@ abstract class AbstractRelation
 	 */
 	public function findAll(array $rows)
 	{
+		$query = $this->reference->selectQuery();
 		$params = [];
 		
 		foreach ($rows as $row) {
@@ -188,12 +189,18 @@ abstract class AbstractRelation
 			}
 		}
 		
-		$results = [];
 		if (count($params)) {
-			$results = $this->reference->findAll($params);
+			foreach ($params as $columnName => $values) {
+				$column = $query->findColumn($columnName);
+				$query->where([
+					[$column, SelectQuery::OP_EQUAL_TO, $values]
+				]);
+			}
+			
+			return $query->fetchAll();
 		}
 		
-		return $results;
+		return [];
 	}
 	
 	/**

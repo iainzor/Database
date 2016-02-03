@@ -3,7 +3,10 @@ namespace Database\Reference;
 
 interface ReferenceInterface
 {
-	public function findAll(array $conditions);
+	/**
+	 * @return \Database\Query\SelectQuery
+	 */
+	public function selectQuery();
 	
 	/**
 	 * @return \Database\Table\Structure

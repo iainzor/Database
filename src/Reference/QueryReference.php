@@ -21,16 +21,11 @@ class QueryReference implements ReferenceInterface
 	}
 	
 	/**
-	 * Find all results from the query using an array of conditions
-	 * 
-	 * @param array $conditions
-	 * @return array
+	 * @return SelectQuery
 	 */
-	public function findAll(array $conditions) 
+	public function selectQuery() 
 	{
-		$this->query->where($conditions);
-		
-		return $this->query->fetchAll();
+		return $this->query;
 	}
 	
 	/**

@@ -31,7 +31,6 @@ class GenericTable extends AbstractTable implements ModelGeneratorInterface
 		parent::__construct($db);
 		
 		$this->_name = $name;
-		$this->structure(new Structure());
 	}
 	
 	/**

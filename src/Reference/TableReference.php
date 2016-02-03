@@ -47,21 +47,16 @@ class TableReference implements ReferenceInterface
 	}
 	
 	/**
-	 * Find all results from a table using a set of conditions
-	 * 
-	 * @param array $conditions
-	 * @return array
+	 * @return \Database\Query\SelectQuery
+	 * @throws \Exception
 	 */
-	public function findAll(array $conditions) 
+	public function selectQuery()
 	{
 		if (!$this->table->db()) {
 			throw new \Exception("No database instance has been given to the referenced table");
 		}
 		
-		$query = $this->table()->select();
-		$query->where($conditions);
-		
-		return $query->fetchAll();
+		return $this->table()->select();
 	}
 	
 	/**

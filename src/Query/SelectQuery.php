@@ -2,8 +2,8 @@
 namespace Database\Query;
 
 use Database\PDO,
-	Database\Model\ModelGeneratorInterface,
-	Database\Model\GenericModel;
+	Database\Table\Column,
+	Database\Table\AbstractTable;
 
 class SelectQuery extends AbstractQuery
 {
@@ -46,6 +46,61 @@ class SelectQuery extends AbstractQuery
 	public function addColumn($column)
 	{
 		$this->columns[] = $column;
+	}
+	
+	/**
+	 * Attempt to find a column in the query
+	 * 
+	 * @param string $columnName
+	 * @return Column
+	 * @throws \Exception
+	 */
+	public function findColumn($columnName) 
+	{
+		$column = $this->_findColumn($columnName, $this->table());
+		if (!$column) {
+			foreach ($this->joins() as $join) {
+				$column = $this->_findColumn($columnName, $join->foreignTable());
+				if ($column) {
+					break;
+				}
+			}
+		}
+		
+		if (!$column) {
+			throw new \Exception("Could not find column '{$columnName}'");
+		}
+		
+		return $column;
+	}
+	
+	/**
+	 * Attempt to find a column in a table
+	 * 
+	 * @param string $columnName
+	 * @param AbstractTable $table
+	 * @return Column|false
+	 */
+	private function _findColumn($columnName, AbstractTable $table) 
+	{
+		$columns = $table->structure()->columns();
+		$col = false;
+		
+		foreach ($columns as $column) {
+			if ($column instanceof Column && $column->name() === $columnName) {
+				$col = $column;
+				break;
+			} else if (is_string($column) && $column === $columnName) {
+				$col = new Column($column, $table);
+				break;
+			}
+		}
+		
+		if ($col !== false) {
+			$col->table($table);
+		}
+		
+		return $col;
 	}
 	
 	/**
