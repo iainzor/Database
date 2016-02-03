@@ -32,6 +32,23 @@ class VirtualTable extends AbstractTable
 		
 		$this->tableName = $tableName;
 		$this->query = $query;
+		
+		$this->initStructure();
+	}
+	
+	private function initStructure()
+	{
+		$structure = new Structure();
+		foreach ($this->query->columns() as $columnName => $columnAlias) {
+			if (!is_numeric($columnName)) {
+				$columnName = $columnAlias;
+			}
+			
+			$structure->column($columnName, [
+				"type" => "varchar"
+			]);
+		}
+		$this->structure($structure);
 	}
 	
 	/**

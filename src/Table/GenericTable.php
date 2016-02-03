@@ -3,8 +3,7 @@ namespace Database\Table;
 
 use Database\PDO,
 	Database\Model\ModelGeneratorInterface,
-	Database\Model\ModelGeneratorTrait,
-	Database\Model\GenericModel;
+	Database\Model\ModelGeneratorTrait;
 
 class GenericTable extends AbstractTable implements ModelGeneratorInterface
 {
