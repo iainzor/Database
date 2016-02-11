@@ -73,6 +73,7 @@ class SelectQuery extends AbstractQuery
 		}
 		
 		if (!$column) {
+			//exit;
 			throw new \Exception("Could not find column '{$columnName}'");
 		}
 		
@@ -92,11 +93,33 @@ class SelectQuery extends AbstractQuery
 		$col = false;
 		
 		foreach ($columns as $column) {
-			if ($column instanceof Column && $column->name() === $columnName) {
-				$col = $column;
-				break;
-			} else if (is_string($column) && $column === $columnName) {
-				$col = new Column($column, $table);
+			$name = null;
+			$alias = null;
+			
+			if ($column instanceof Column) {
+				$name = $column->name();
+				$alias = $column->alias();
+				$_col = $column;
+			} else if (is_string($column)) {
+				$name = $column;
+				$alias = $name;
+				$_col = new Column($name, $table);
+			} else if (is_array($column)) {
+				$keys = array_keys($column);
+				
+				if (!is_numeric($keys[0])) {
+					$name = $keys[0];
+					$alias = $column[$name];
+				} else {
+					$name = $column[0];
+					$alias = $name;
+				}
+			} else {
+				continue;
+			}
+			
+			if ($columnName === $name || $columnName === $alias) {
+				$col = $_col;
 				break;
 			}
 		}
