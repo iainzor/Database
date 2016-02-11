@@ -6,7 +6,8 @@ use Database\PDO,
 	Database\Table\Column,
 	Database\Query\WhereGroup,
 	Database\Query\WhereExpr,
-	Database\Query\QueryInterface;
+	Database\Query\QueryInterface,
+	Database\Query\SelectQuery;
 
 class WhereClauseGenerator
 {
@@ -14,6 +15,11 @@ class WhereClauseGenerator
 	 * @var AbstractTable
 	 */
 	private $baseTable;
+	
+	/**
+	 * @var SelectQuery
+	 */
+	private $baseQuery;
 	
 	/**
 	 * @var WhereGroup[]
@@ -25,10 +31,12 @@ class WhereClauseGenerator
 	 * 
 	 * @param AbstractTable $baseTable
 	 * @param WhereGroup[] $whereGroups
+	 * @param SelectQuery $baseQuery
 	 */
-	public function __construct(AbstractTable $baseTable, array $whereGroups)
+	public function __construct(AbstractTable $baseTable, array $whereGroups, SelectQuery $baseQuery = null)
 	{
 		$this->baseTable = $baseTable;
+		$this->baseQuery = $baseQuery;
 		$this->whereGroups = $whereGroups;
 	}
 	
@@ -160,8 +168,14 @@ class WhereClauseGenerator
 		}
 		
 		if (is_string($column) && preg_match("/^`?([a-z0-9-_]+)`?\.?`?([a-z0-9-_]+)?`?$/i", $column, $matches)) {
-			$tableName = !empty($matches[2]) ? $matches[1] : $this->baseTable->alias();
-			$columnName = !empty($matches[2]) ? $matches[2] : $matches[1];
+			if (empty($matches[2]) && $this->baseQuery) {
+				$column = $this->baseQuery->findColumn($column);
+				$tableName = $column->table()->alias();
+				$columnName = $column->name();
+			} else {
+				$tableName = !empty($matches[2]) ? $matches[1] : $this->baseTable->alias();
+				$columnName = !empty($matches[2]) ? $matches[2] : $matches[1];
+			}
 			
 			return "`{$tableName}`.`{$columnName}`";
 		}

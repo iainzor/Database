@@ -34,7 +34,7 @@ class SelectSqlGenerator
 		$table = $this->query->table();
 		$dbName = $table->db()->schemaName();
 		
-		$whereGenerator = new WhereClauseGenerator($table, $this->query->whereGroups());
+		$whereGenerator = new WhereClauseGenerator($table, $this->query->whereGroups(), $this->query);
 		$orderGenerator = new OrderClauseGenerator($table, $this->query->orderings());
 		$limitGenerator = new LimitClauseGenerator($table, $this->query->maxResults(), $this->query->resultOffset());
 		
