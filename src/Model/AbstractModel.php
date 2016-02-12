@@ -1,9 +1,7 @@
 <?php
 namespace Database\Model;
 
-use Bliss\ResourceComponent;
+use Bliss\Component;
 
-abstract class AbstractModel extends ResourceComponent 
-{
-	
-}
+abstract class AbstractModel extends Component 
+{}
