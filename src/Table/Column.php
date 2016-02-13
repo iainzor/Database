@@ -131,7 +131,7 @@ class Column
 			}
 			
 			if (!($instance instanceof ValueType\TypeInterface)) {
-				throw new \InvalidArgumentException("Value type must be an instance of \\Database\\Table\\ValueType\\TypeInterface");
+				$instance = new ValueType\Varchar();
 			}
 			
 			$this->type = $instance;

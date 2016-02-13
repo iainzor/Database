@@ -181,7 +181,7 @@ abstract class AbstractRelation
 		foreach ($rows as $row) {
 			foreach ($this->localKeys as $i => $localKey) {
 				$foreignKey = $this->foreignKeys[$i];
-				$localValue = $row->getSet($localKey);
+				$localValue = call_user_func([$row, $localKey]);
 				
 				if (!empty($localValue)) {
 					$params[$foreignKey][] = $localValue;
@@ -215,8 +215,8 @@ abstract class AbstractRelation
 		$matched = 0;
 		foreach ($this->localKeys as $i => $localKey) {
 			$foreignKey = $this->foreignKeys[$i];
-			$foreignValue = $foreignRow->getSet($foreignKey);
-			$localValue = $localRow->getSet($localKey);
+			$foreignValue = call_user_func([$foreignRow, $foreignKey]);
+			$localValue = call_user_func([$localRow, $localKey]);
 			
 			if (!empty($foreignValue) && !empty($localValue)) {
 				if ($localValue == $foreignValue) {
