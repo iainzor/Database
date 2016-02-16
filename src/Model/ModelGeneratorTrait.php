@@ -14,8 +14,8 @@ trait ModelGeneratorTrait
 	{
 		if ($this instanceof ModelGeneratorInterface) {
 			$model = $this->createModelInstance();
-			if (!($model instanceof AbstractModel)) {
-				throw new \Exception("Model must be an instance of \\Database\\Model\\AbstractModel");
+			if (!($model instanceof ModelInterface)) {
+				throw new \Exception("Model must be an instance of \\Database\\Model\\ModelInterface");
 			}
 			AbstractModel::populate($model, $properties);
 
