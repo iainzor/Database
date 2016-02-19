@@ -2,7 +2,7 @@
 namespace Database\Query;
 
 use Database\Table\Row,
-	Database\Model\AbstractModel;
+	Database\Model\ModelInterface;
 
 class InsertQuery extends AbstractQuery
 {
@@ -37,7 +37,7 @@ class InsertQuery extends AbstractQuery
 			$row = new Row(
 				$this->generateModel($data)
 			);
-		} else if ($data instanceof AbstractModel) {
+		} else if ($data instanceof ModelInterface) {
 			$row = new Row($data);
 		} else if ($data instanceof Row) {
 			$row = $data;

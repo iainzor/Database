@@ -4,7 +4,7 @@ namespace Database\Relation;
 use Database\Table\AbstractTable,
 	Database\Query\SelectQuery,
 	Database\Reference,
-	Database\Model\AbstractModel;
+	Database\Model\ModelInterface;
 
 abstract class AbstractRelation
 {
@@ -206,11 +206,11 @@ abstract class AbstractRelation
 	/**
 	 * Check if a local and foreign row match based on the relation's local and foreign keys
 	 * 
-	 * @param array $localRow
-	 * @param array $foreignRow
+	 * @param ModelInterface $localRow
+	 * @param ModelInterface $foreignRow
 	 * @return boolean
 	 */
-	protected function rowsMatch(AbstractModel $localRow, AbstractModel $foreignRow)
+	protected function rowsMatch(ModelInterface $localRow, ModelInterface $foreignRow)
 	{
 		$matched = 0;
 		foreach ($this->localKeys as $i => $localKey) {

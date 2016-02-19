@@ -1,12 +1,12 @@
 <?php
 namespace Database\Table;
 
-use Database\Model\AbstractModel;
+use Database\Model\ModelInterface;
 
 class Row
 {
 	/**
-	 * @var AbstractModel
+	 * @var ModelInterface
 	 */
 	private $data;
 	
@@ -18,9 +18,9 @@ class Row
 	/**
 	 * Constructor
 	 * 
-	 * @param AbstractModel $data
+	 * @param ModelInterface $data
 	 */
-	public function __construct($data)
+	public function __construct(ModelInterface $data)
 	{
 		$this->data($data);
 	}
@@ -28,10 +28,10 @@ class Row
 	/**
 	 * Get or set the row's data model
 	 * 
-	 * @param AbstractModel $data
-	 * @return AbstractModel
+	 * @param ModelInterface $data
+	 * @return ModelInterface
 	 */
-	public function data(AbstractModel $data = null)
+	public function data(ModelInterface $data = null)
 	{
 		if ($data !== null) {
 			$this->columns = [];
