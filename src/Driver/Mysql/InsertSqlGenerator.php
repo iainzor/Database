@@ -2,7 +2,7 @@
 namespace Database\Driver\Mysql;
 
 use Database\Query\InsertQuery,
-	Database\Table\Column;
+	Database\Table\ColumnExpr;
 
 class InsertSqlGenerator
 {
@@ -84,6 +84,8 @@ class InsertSqlGenerator
 					$value = (int) $value;
 				} else if ($value === null) {
 					$value = "NULL";
+				} else if ($value instanceof ColumnExpr) {
+					$value = $value->expr();
 				} else {
 					$value = $db->quote($value);
 				}
