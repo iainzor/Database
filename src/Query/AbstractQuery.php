@@ -98,4 +98,81 @@ abstract class AbstractQuery implements QueryInterface
 			return Model\GenericModel::populate($model, $data);
 		}
 	}
+	
+	/**
+	 * Attempt to find a column in the query
+	 * 
+	 * @param string $columnName
+	 * @return Table\Column
+	 * @throws \Exception
+	 */
+	public function findColumn($columnName) 
+	{
+		$column = $this->_findColumn($columnName, $this->table());
+		if (!$column && $this instanceof SelectQuery) {
+			foreach ($this->joins() as $join) {
+				$column = $this->_findColumn($columnName, $join->foreignTable());
+				if ($column) {
+					break;
+				}
+			}
+		}
+		
+		if (!$column) {
+			throw new \Exception("Could not find column '{$columnName}'");
+		}
+		
+		return $column;
+	}
+	
+	/**
+	 * Attempt to find a column in a table
+	 * 
+	 * @param string $columnName
+	 * @param Table\AbstractTable $table
+	 * @return Column|false
+	 */
+	private function _findColumn($columnName, Table\AbstractTable $table) 
+	{
+		$columns = $table->structure()->columns();
+		$col = false;
+		
+		foreach ($columns as $column) {
+			$name = null;
+			$alias = null;
+			
+			if ($column instanceof Table\Column) {
+				$name = $column->name();
+				$alias = $column->alias();
+				$_col = $column;
+			} else if (is_string($column)) {
+				$name = $column;
+				$alias = $name;
+				$_col = new Table\Column($name, $table);
+			} else if (is_array($column)) {
+				$keys = array_keys($column);
+				
+				if (!is_numeric($keys[0])) {
+					$name = $keys[0];
+					$alias = $column[$name];
+				} else {
+					$name = $column[0];
+					$alias = $name;
+				}
+			} else {
+				continue;
+			}
+			
+			if ($columnName === $name || $columnName === $alias) {
+				$col = $_col;
+				break;
+			}
+		}
+		
+		if ($col !== false) {
+			$col->table($table);
+		}
+		
+		return $col;
+	}
 }
