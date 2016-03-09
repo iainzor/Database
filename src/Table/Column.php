@@ -70,6 +70,23 @@ class Column
 	}
 	
 	/**
+	 * Generate the full name for the column, 
+	 * If a table is set its full name will be appended
+	 * 
+	 * @param boolean $quoted Whether to add quotes around the names
+	 * @return string
+	 */
+	public function fullName($quoted = false) 
+	{
+		$name = $quoted ? "`{$this->name}`" : $this->name;
+		if ($this->table) {
+			$tablePath = $this->table->fullName($quoted);
+			$name = "{$tablePath}.{$name}";
+		}
+		return $name;
+	}
+	
+	/**
 	 * Get or set the table the column belongs to
 	 * 
 	 * @param AbstractTable $table

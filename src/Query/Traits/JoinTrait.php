@@ -49,7 +49,7 @@ trait JoinTrait
 	 * @param int $type
 	 * @return JoinExpr
 	 */
-	public function join($foreignTable, $foreignKeys, $localKeys = null, array $columns = null, $type = QueryInterface::JOIN_DEFAULT)
+	public function join($foreignTable, $foreignKeys = null, $localKeys = null, array $columns = null, $type = QueryInterface::JOIN_DEFAULT)
 	{
 		$expr = new JoinExpr($this, $foreignTable, $foreignKeys, $localKeys, $columns, $type);
 		$this->joins[] = $expr;
@@ -66,7 +66,7 @@ trait JoinTrait
 	 * @param array $columns
 	 * @return JoinExpr
 	 */
-	public function leftJoin($foreignTable, $foreignKeys, $localKeys, array $columns = null)
+	public function leftJoin($foreignTable, $foreignKeys = null, $localKeys = null, array $columns = null)
 	{
 		return $this->join($foreignTable, $foreignKeys, $localKeys, $columns, QueryInterface::JOIN_LEFT);
 	}

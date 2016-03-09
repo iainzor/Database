@@ -66,6 +66,20 @@ class Registry
 	}
 	
 	/**
+	 * Get all connections in the registry
+	 * 
+	 * @return PDO[]
+	 */
+	public function connections()
+	{
+		$connections = [];
+		foreach ($this->connections as $id => $connection) {
+			$connections[] = $this->get($id);
+		}
+		return $connections;
+	}
+	
+	/**
 	 * Get or set the default connection for the registry
 	 * If no default connection is set, the first available connection will be returned and set as the new default
 	 * 

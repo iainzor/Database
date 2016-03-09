@@ -53,7 +53,7 @@ class JoinExpr
 	 * @param array $columns
 	 * @param int $type
 	 */
-	public function __construct(AbstractQuery $query, $foreignTable, $foreignKeys, $localKeys, array $columns = null, $type = QueryInterface::JOIN_DEFAULT) 
+	public function __construct(AbstractQuery $query, $foreignTable, $foreignKeys = null, $localKeys = null, array $columns = null, $type = QueryInterface::JOIN_DEFAULT) 
 	{
 		$this->query = $query;
 		
