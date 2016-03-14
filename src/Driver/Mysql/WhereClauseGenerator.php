@@ -125,7 +125,7 @@ class WhereClauseGenerator
 				foreach (array_unique($value) as $v) {
 					$parts[] = $columnName ." {$operatorSymbol} ". $this->parseValue($v, $this->baseTable->db());
 				}
-				return implode(" OR ", $parts);
+				return "(". implode(" OR ", $parts) .")";
 			} else if ($value) {
 				return "{$columnName} {$operatorSymbol} ". $this->parseValue($value, $this->baseTable->db());
 			} else {
