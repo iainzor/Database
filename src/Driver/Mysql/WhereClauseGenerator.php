@@ -122,9 +122,18 @@ class WhereClauseGenerator
 			
 			if (is_array($value)) {
 				$parts = [];
-				foreach (array_unique($value) as $v) {
-					$parts[] = $columnName ." {$operatorSymbol} ". $this->parseValue($v, $this->baseTable->db());
+				$values = array_map([$this->baseTable->db(), "quote"], array_unique($value));
+				
+				if ($operator === QueryInterface::OP_EQUAL_TO) {
+					$parts[] = $columnName ." IN (". implode(",", $values) .")";
+				} else if ($operator === QueryInterface::OP_NOT_EQUAL_TO) {
+					$parts[] = $columnName ." NOT IN (". implode(",", $values) .")";
+				} else {
+					foreach ($values as $v) {
+						$parts[] = $columnName ." {$operatorSymbol} ". $this->parseValue($v, $this->baseTable->db());
+					}
 				}
+				
 				return "(". implode(" OR ", $parts) .")";
 			} else if ($value) {
 				return "{$columnName} {$operatorSymbol} ". $this->parseValue($value, $this->baseTable->db());
@@ -218,7 +227,7 @@ class WhereClauseGenerator
 	 * @param PDO $db
 	 * @return string
 	 */
-	private function parseValue($value, PDO $db)
+	public function parseValue($value, PDO $db)
 	{
 		if (substr($value, 0, 1) === ":") {
 			return $value;

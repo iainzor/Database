@@ -183,9 +183,7 @@ abstract class AbstractRelation
 				$foreignKey = $this->foreignKeys[$i];
 				$localValue = call_user_func([$row, $localKey]);
 				
-				if (!empty($localValue)) {
-					$params[$foreignKey][] = $localValue;
-				}
+				$params[$foreignKey][] = $localValue;
 			}
 		}
 		
@@ -218,10 +216,8 @@ abstract class AbstractRelation
 			$foreignValue = call_user_func([$foreignRow, $foreignKey]);
 			$localValue = call_user_func([$localRow, $localKey]);
 			
-			if (!empty($foreignValue) && !empty($localValue)) {
-				if ($localValue == $foreignValue) {
-					$matched++; 
-				}
+			if ($localValue == $foreignValue) {
+				$matched++; 
 			}
 		}
 		
