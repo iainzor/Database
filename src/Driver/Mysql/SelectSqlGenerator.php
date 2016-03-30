@@ -36,6 +36,7 @@ class SelectSqlGenerator
 		
 		$whereGenerator = new WhereClauseGenerator($table, $this->query->whereGroups(), $this->query);
 		$orderGenerator = new OrderClauseGenerator($table, $this->query->orderings());
+		$groupGenerator = new GroupClauseGenerator($table, $this->query->groupings());
 		$limitGenerator = new LimitClauseGenerator($table, $this->query->maxResults(), $this->query->resultOffset());
 		
 		if (!empty($dbName)) {
@@ -48,7 +49,7 @@ class SelectSqlGenerator
 			"FROM {$table->fullName(true)} AS `{$table->alias()}`",
 			$this->joinClause(),
 			$whereGenerator->generate(),
-			$this->groupClause(),
+			$groupGenerator->generate(),
 			$orderGenerator->generate(),
 			$limitGenerator->generate()
 		];
@@ -171,22 +172,5 @@ class SelectSqlGenerator
 		}
 		
 		return implode("\n", $lines);
-	}
-	
-	/**
-	 * Generate a GROUP BY clause for the query
-	 * 
-	 * @return string
-	 */
-	private function groupClause()
-	{
-		$parts = [];
-		foreach ($this->query->groupings() as $expr) {
-			$column = $expr->column();
-			$table = $column->table();
-			$parts[] = sprintf("`%s`.`%s`", $table->alias(), $column->name());
-		}
-		
-		return count($parts) ? "GROUP BY ". implode(", ", $parts) : null;
 	}
 }

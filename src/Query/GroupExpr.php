@@ -1,7 +1,8 @@
 <?php
 namespace Database\Query;
 
-use Database\Table\Column;
+use Database\Table\Column,
+	Database\Table\ColumnExpr;
 
 class GroupExpr
 {
@@ -19,7 +20,7 @@ class GroupExpr
 	 * Constructor
 	 * 
 	 * @param \Database\Query\AbstractQuery $query
-	 * @param string|Column $column
+	 * @param string|Column|ColumnExpr $column
 	 */
 	public function __construct(AbstractQuery $query, $column)
 	{
@@ -31,8 +32,8 @@ class GroupExpr
 	/**
 	 * Get or set the column to be grouped
 	 * 
-	 * @param string|Column $column
-	 * @return Column
+	 * @param string|Column|ColumnExpr $column
+	 * @return Column|ColumnExpr
 	 * @throws \UnexpectedValueException
 	 */
 	public function column($column = null)
@@ -52,8 +53,8 @@ class GroupExpr
 				$column = new Column($columnName, $table);
 			}
 			
-			if (!($column instanceof Column)) {
-				throw new \UnexpectedValueException("Column must be a name of a column or instance of \\Database\\Table\\Column");
+			if (!($column instanceof Column) && !($column instanceof ColumnExpr)) {
+				throw new \UnexpectedValueException("Column must be a name of a column or instance of Column or ColumnExpr");
 			}
 			
 			$this->column = $column;
