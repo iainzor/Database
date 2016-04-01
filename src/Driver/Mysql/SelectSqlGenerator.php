@@ -123,7 +123,7 @@ class SelectSqlGenerator
 			$foreignTable = $join->foreignTable();
 			$foreignDbName = $foreignTable->db()->schemaName();
 			$foreignKeys = $join->foreignKeys();
-			$localTable = empty($join->localTable()) ? $this->query->table() : $join->localTable();
+			$localTable = $join->localTable() ? $join->localTable() : $this->query->table();
 			$localKeys = $join->localKeys();
 			$conditions = [];
 			$isVirtual = $foreignTable instanceof VirtualTable;
