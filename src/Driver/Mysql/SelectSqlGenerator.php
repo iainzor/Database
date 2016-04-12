@@ -99,6 +99,16 @@ class SelectSqlGenerator
 		
 		if ($name instanceof ColumnExpr) {
 			return $name->expr();
+		} else if ($alias instanceof ColumnExpr) {
+			return $alias->expr();
+		} else if ($name instanceof Column) {
+			$table = $name->table();
+			$alias = $name->alias();
+			$name = $name->name();
+		} else if ($alias instanceof Column) {
+			$table = $alias->table();
+			$name = $alias->name();
+			$alias = $alias->alias();
 		}
 		
 		$parts = [
