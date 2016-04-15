@@ -135,7 +135,7 @@ class WhereClauseGenerator
 				}
 				
 				return "(". implode(" OR ", $parts) .")";
-			} else if ($value) {
+			} else if ($value !== null) {
 				return "{$columnName} {$operatorSymbol} ". $this->parseValue($value, $this->baseTable->db());
 			} else {
 				return $columnName ." ". $operatorSymbol;
