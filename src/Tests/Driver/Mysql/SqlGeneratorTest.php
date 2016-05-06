@@ -71,7 +71,17 @@ class SqlGeneratorTest extends \PHPUnit_Framework_TestCase
 			"bar" => "baz"
 		]);
 		$query->where(["id" => 123]);
-		$sql = $factory->sqlGenerator()->generate($query);
+		
+		try {
+			$sql = $factory->sqlGenerator()->generate($query);
+		} catch (\Exception $e) {
+			echo "<pre>";
+			echo $e->getMessage();
+			echo "\n";
+			echo $e->getTraceAsString();
+			exit;
+		}
+			
 		$cleaned = $this->_clean($sql);
 		$expected = "UPDATE `my_table` "
 				  . "SET `foo` = 'bar', `bar` = 'baz' "

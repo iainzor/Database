@@ -3,7 +3,8 @@ namespace Database\Tests\Table;
 
 use Database\Table\Structure,
 	Database\Table\GenericTable,
-	Database\Relation\RelationMap;
+	Database\Relation\RelationMap,
+	Database\Tests\TestDb;
 
 class StructureTest extends \PHPUnit_Framework_TestCase
 {
@@ -81,8 +82,10 @@ class StructureTest extends \PHPUnit_Framework_TestCase
 				"type" => "int"
 			]
 		]);
+		$db = TestDb::pdo();
+		$foos = new GenericTable("foos", $db);
 		$barMap = new RelationMap();
-		$barMap->hasOne("foo", "foos", "foo_id", "id");
+		$barMap->hasOne("foo", $foos, "foo_id", "id");
 		
 		$data = $barStruct->parseRow([
 			"id" => "123",

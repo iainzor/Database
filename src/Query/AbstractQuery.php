@@ -104,7 +104,6 @@ abstract class AbstractQuery implements QueryInterface
 	 * 
 	 * @param string $columnName
 	 * @return Table\Column
-	 * @throws \Exception
 	 */
 	public function findColumn($columnName) 
 	{
@@ -119,7 +118,7 @@ abstract class AbstractQuery implements QueryInterface
 		}
 		
 		if (!$column) {
-			throw new \Exception("Could not find column '{$columnName}'");
+			$column = new Table\Column($columnName, $this->table());
 		}
 		
 		return $column;

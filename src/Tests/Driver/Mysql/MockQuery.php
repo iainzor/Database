@@ -3,7 +3,8 @@ namespace Database\Tests\Driver\Mysql;
 
 use Database\Table,
 	Database\Query,
-	Database\Tests\TestDb;
+	Database\Tests\TestDb,
+	Database\Table\Structure;
 
 class MockQuery
 {
@@ -11,13 +12,23 @@ class MockQuery
 	{
 		$db = TestDb::pdo();
 		$players = new Table\GenericTable("players", $db);
+		$players->structure(new Structure([
+			"role" => [
+				"type" => "varchar"
+			]
+		]));
+		
 		$servers = new Table\GenericTable("servers", $db);
+		$servers->structure(new Structure());
+		
+		$suspensions = new Table\GenericTable("suspensions", $db);
+		$suspensions->structure(new Structure());
 		
 		$query = new Query\SelectQuery(TestDb::pdo());
 		$query->from($players);
 		$query->columns(["*"]);
 		$query->join($servers, "id", "serverId");
-		$query->leftJoin("suspensions", "playerId", "id", [
+		$query->leftJoin($suspensions, "playerId", "id", [
 			"id" => "suspensionId",
 			"date"
 		]);
