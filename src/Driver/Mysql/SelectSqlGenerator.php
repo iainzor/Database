@@ -144,17 +144,21 @@ class SelectSqlGenerator
 				}
 				
 				$localKey = $localKeys[$i];
-				if ($localKey instanceof Column) {
-					$localTable = $localKey->table();
-					$localKey = $localKey->name();
+				
+				if (!($foreignKey instanceof Column)) {
+					$foreignKey = $foreignTable->column($foreignKey);
 				}
 				
-				$foreignPath = $foreignTable->fullName(true) .".`{$foreignKey}`";
+				if (!($localKey instanceof Column)) {
+					$localKey = $localTable->column($localKey);
+				}
+				
+				$foreignPath = $foreignKey->fullName(true);
 				if ($foreignTable->name() !== $foreignTable->alias() || $isVirtual) {
-					$foreignPath = "`{$foreignTable->alias()}`.`{$foreignKey}`";
+					$foreignPath = "`{$foreignTable->alias()}`.`". $foreignKey->name() ."`";
 				}
 				
-				$join->where("{$localTable->fullName(true)}.`{$localKey}` = {$foreignPath}");
+				$join->where($localKey->fullName(true) ." = ". $foreignPath);
 			}
 			
 			switch ($join->type()) {
