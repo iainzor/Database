@@ -53,9 +53,15 @@ class Structure
 			$column = Column::factory($config);
 			$this->columns[$name] = $column;
 		}
-		if (!isset($this->columns[$name])) {
-			$this->columns[$name] = new Column($name);
+		
+		foreach ($this->columns as $column) {
+			if ($column->name() == $name || $column->alias() == $name) {
+				return $column;
+			}
 		}
+		
+		$this->columns[$name] = new Column($name);
+		
 		return $this->columns[$name];
 	}
 	
@@ -71,7 +77,12 @@ class Structure
 		if (count($this->columns) === 0) {
 			return true;
 		}
-		return isset($this->columns[$name]) ? true : false;
+		foreach ($this->columns as $column) {
+			if ($column->name() == $name || $column->alias() == $name) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**

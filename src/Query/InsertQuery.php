@@ -33,12 +33,13 @@ class InsertQuery extends AbstractQuery
 	 */
 	public function addRow($data)
 	{
+		$struct = isset($this->table) ? $this->table->structure() : null;
+		
 		if (is_array($data)) {
-			$row = new Row(
-				$this->generateModel($data)
-			);
+			$model = $this->generateModel($data);
+			$row = new Row($model, $struct);
 		} else if ($data instanceof ModelInterface) {
-			$row = new Row($data);
+			$row = new Row($data, $struct);
 		} else if ($data instanceof Row) {
 			$row = $data;
 		}

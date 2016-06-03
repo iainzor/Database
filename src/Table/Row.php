@@ -11,6 +11,11 @@ class Row
 	private $data;
 	
 	/**
+	 * @var Structure
+	 */
+	private $structure;
+	
+	/**
 	 * @var Column[]
 	 */
 	private $columns = [];
@@ -19,9 +24,11 @@ class Row
 	 * Constructor
 	 * 
 	 * @param ModelInterface $data
+	 * @param Structure $structure
 	 */
-	public function __construct(ModelInterface $data)
+	public function __construct(ModelInterface $data, Structure $structure = null)
 	{
+		$this->structure = $structure;
 		$this->data($data);
 	}
 	
@@ -39,7 +46,11 @@ class Row
 			$keys = array_keys($data->toBasicArray());
 
 			foreach ($keys as $key) {
-				$this->columns[] = new Column($key);
+				if ($this->structure && $this->structure->isColumn($key)) {
+					$this->columns[] = $this->structure->column($key);
+				} else {
+					$this->columns[] = new Column($key);
+				}
 			}
 		}
 		
@@ -59,12 +70,16 @@ class Row
 	/**
 	 * Attempt to get the column of a column in the row
 	 * 
-	 * @param string $column
-	 * @param mixed $defaultValue
+	 * @param string $name The name or alias of the column
 	 * @return mixed
 	 */
-	public function value($column, $defaultValue = null)
+	public function value($name)
 	{
-		return $this->data->getSet($column);
+		if ($this->structure) {
+			$column = $this->structure->column($name);
+			$name = $column->alias();
+		}
+		
+		return $this->data->getSet($name);
 	}
 }

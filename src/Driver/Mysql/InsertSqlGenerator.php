@@ -2,7 +2,8 @@
 namespace Database\Driver\Mysql;
 
 use Database\Query\InsertQuery,
-	Database\Table\ColumnExpr;
+	Database\Table\ColumnExpr,
+	Database\Table\Column;
 
 class InsertSqlGenerator
 {
@@ -58,10 +59,15 @@ class InsertSqlGenerator
 	public function columnList()
 	{
 		$columns = $this->columns();
+		$names = [];
+		
+		foreach ($columns as $column) {
+			$names[] = $column->name();
+		}
 		
 		return "(". implode(", ", array_map(function($name) { 
 			return "`{$name}`"; 
-		}, $columns)) .")";
+		}, $names)) .")";
 	}
 	
 	/**
@@ -77,7 +83,8 @@ class InsertSqlGenerator
 		
 		foreach ($this->query->rows() as $row) {
 			$r = [];
-			foreach ($columns as $columnName) {
+			foreach ($columns as $column) {
+				$columnName = $column->alias();
 				$value = $row->value($columnName);
 				
 				if ($value === true || $value === false) {
@@ -101,17 +108,16 @@ class InsertSqlGenerator
 	/**
 	 * Get a list of all unique columns listed in the row data
 	 * 
-	 * @return array
+	 * @return Column[]
 	 */
 	private function columns()
 	{
 		$columns = [];
 		$structure = $this->query->table()->structure();
-		
 		foreach ($this->query->rows() as $row) {
 			foreach ($row->columns() as $column) {
-				if (!in_array($column->name(), $columns) && $structure->isColumn($column->name())) {
-					$columns[] = $column->name();
+				if (!isset($columns[$column->name()]) && $structure->isColumn($column->name())) {
+					$columns[$column->name()] = $column;
 				}
 			}
 		}
