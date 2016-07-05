@@ -19,9 +19,9 @@ class SqlGeneratorTest extends \PHPUnit_Framework_TestCase
 				  . "FROM `bliss_database_tests`.`players` AS `players` "
 				  . "JOIN `bliss_database_tests`.`servers` AS `servers` ON (`bliss_database_tests`.`players`.`serverId` = `bliss_database_tests`.`servers`.`id`) "
 				  . "LEFT JOIN `bliss_database_tests`.`suspensions` AS `suspensions` ON (`bliss_database_tests`.`players`.`id` = `bliss_database_tests`.`suspensions`.`playerId`) "
-				  . "WHERE (`players`.`id` > :maxId AND `players`.`name` LIKE :name AND `servers`.`id` IS NOT NULL) OR (`players`.`role` = 'admin') "
+				  . "WHERE (`players`.`id` > :maxId AND `servers`.`name` LIKE :name AND `servers`.`id` IS NOT NULL) OR (`players`.`role` = 'admin') "
 				  . "GROUP BY `servers`.`id` "
-				  . "ORDER BY `servers`.`name` ASC, `players`.`name` DESC "
+				  . "ORDER BY `servers`.`name` DESC "
 				  . "LIMIT 100 OFFSET 50";
 		
 		$this->assertEquals($expected, $cleaned);
