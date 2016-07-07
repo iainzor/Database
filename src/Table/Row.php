@@ -43,13 +43,19 @@ class Row
 		if ($data !== null) {
 			$this->columns = [];
 			$this->data = $data;
-			$keys = array_keys($data->toBasicArray());
-
-			foreach ($keys as $key) {
-				if ($this->structure && $this->structure->isColumn($key)) {
-					$this->columns[] = $this->structure->column($key);
+			
+			$properties = $data->toArray();
+			$refClass = new \ReflectionClass($data);
+			foreach ($refClass->getProperties() as $prop) {
+				$name = $prop->getName();
+				$properties[$name] = "";
+			}
+			
+			foreach ($properties as $name => $value) {
+				if ($this->structure && $this->structure->isColumn($name)) {
+					$this->columns[] = $this->structure->column($name);
 				} else {
-					$this->columns[] = new Column($key);
+					$this->columns[] = new Column($name);
 				}
 			}
 		}
@@ -80,6 +86,6 @@ class Row
 			$name = $column->alias();
 		}
 		
-		return $this->data->getSet($name);
+		return call_user_func([$this->data, $name]);
 	}
 }
