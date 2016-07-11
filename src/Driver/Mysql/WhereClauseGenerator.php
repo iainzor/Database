@@ -130,13 +130,13 @@ class WhereClauseGenerator
 					$parts[] = $columnName ." NOT IN (". implode(",", $values) .")";
 				} else {
 					foreach ($values as $v) {
-						$parts[] = $columnName ." {$operatorSymbol} ". $this->parseValue($v, $this->baseTable->db());
+						$parts[] = $columnName ." {$operatorSymbol} ". $this->parseValue($v, $operator, $this->baseTable->db());
 					}
 				}
 				
 				return "(". implode(" OR ", $parts) .")";
 			} else if ($value !== null) {
-				return "{$columnName} {$operatorSymbol} ". $this->parseValue($value, $this->baseTable->db());
+				return "{$columnName} {$operatorSymbol} ". $this->parseValue($value, $operator, $this->baseTable->db());
 			} else {
 				return $columnName ." ". $operatorSymbol;
 			}
@@ -214,6 +214,8 @@ class WhereClauseGenerator
 			case QueryInterface::OP_LESS_OR_EQUAL_TO:
 				return "<=";
 			case QueryInterface::OP_CONTAINS:
+			case QueryInterface::OP_STARTS_WITH:
+			case QueryInterface::OP_ENDS_WITH:
 				return "LIKE";
 			default: 
 				return $operator;
@@ -224,15 +226,25 @@ class WhereClauseGenerator
 	 * Parse a value for the query
 	 * 
 	 * @param string $value
+	 * @param int $operator
 	 * @param PDO $db
 	 * @return string
 	 */
-	public function parseValue($value, PDO $db)
+	public function parseValue($value, $operator, PDO $db)
 	{
 		if (substr($value, 0, 1) === ":") {
 			return $value;
-		} else {
-			return $db->quote($value);
+		}
+		
+		switch ($operator) {
+			case QueryInterface::OP_CONTAINS:
+				return $db->quote("%". $value ."%");
+			case QueryInterface::OP_STARTS_WITH:
+				return $db->quote($value ."%");
+			case QueryInterface::OP_ENDS_WITH:
+				return $db->quote("%". $value);
+			default:
+				return $db->quote($value);
 		}
 	}
 }
