@@ -90,12 +90,22 @@ abstract class AbstractQuery implements QueryInterface
 		if (!$table) {
 			throw new \Exception("Cannot generate a model without a table instance");
 		}
+		
+		$structure = $table->structure();
+		$parsed = [];
+		
+		foreach ($data as $name => $value) {
+			if ($structure->isColumn($name)) {
+				$column = $structure->column($name);
+				$parsed[$column->alias()] = $value;
+			}
+		}
 
 		if ($table instanceof Model\ModelGeneratorInterface) {
-			return $table->generateModel($data);
+			return $table->generateModel($parsed);
 		} else {
 			$model = new Model\GenericModel($table->alias());
-			return Model\GenericModel::populate($model, $data);
+			return Model\GenericModel::populate($model, $parsed);
 		}
 	}
 	
