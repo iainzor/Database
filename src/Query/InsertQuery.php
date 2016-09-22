@@ -100,7 +100,7 @@ class InsertQuery extends AbstractQuery
 
 			$this->db()->exec($sql);
 			$this->_updateInsertedRows($this->db()->lastInsertId(), $this->rows);
-
+			
 			$results = [];
 			foreach ($this->rows as $row) {
 				$model = $row->data();
@@ -133,12 +133,15 @@ class InsertQuery extends AbstractQuery
 			$structure = $table->structure();
 
 			if ($structure->isColumn("id")) {
+				$column = $structure->column("id");
 				$query = new SelectQuery($this->db());
 				$query->from($this->table());
-				$query->columns(["id"]);
+				$query->columns([$column->name()]);
 				$query->limit(count($needIds));
-				$query->orderBy("id")->asc();
-				$query->where("id >= :lastId");
+				$query->orderBy($column)->asc();
+				$query->where([
+					[$column->name(), self::OP_GREATER_OR_EQUAL_TO, ":lastId"]
+				]);
 				
 				$lastResults = $query->fetchAll([
 					":lastId" => $lastId
