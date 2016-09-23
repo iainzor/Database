@@ -80,9 +80,10 @@ abstract class AbstractQuery implements QueryInterface
 	 * Generate a new model instance from a single row of data
 	 * 
 	 * @param array|Model\AbstractModel $data
+	 * @param boolean $ignoreStructure Whether to ignore the base table's structure when parsing values
 	 * @return Model\AbstractModel
 	 */
-	public function generateModel($data)
+	public function generateModel($data, $ignoreStructure = false)
 	{
 		$table = $this->table();
 		$data = Component::convertValueToArray($data);
@@ -95,7 +96,7 @@ abstract class AbstractQuery implements QueryInterface
 		$parsed = [];
 		
 		foreach ($data as $name => $value) {
-			if ($structure->isColumn($name)) {
+			if ($structure->isColumn($name) || $ignoreStructure) {
 				$column = $structure->column($name);
 				$parsed[$column->alias()] = $value;
 			}

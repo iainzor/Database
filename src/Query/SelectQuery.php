@@ -167,7 +167,7 @@ class SelectQuery extends AbstractQuery
 		$map = $this->relationMap();
 		
 		foreach ($results as $i => $result) {
-			$results[$i] = $this->generateModel($result);
+			$results[$i] = $this->generateModel($result, true);
 		}
 		
 		return $map->applyToRowset($results);
