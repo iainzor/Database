@@ -98,7 +98,7 @@ abstract class AbstractQuery implements QueryInterface
 		foreach ($data as $name => $value) {
 			if ($structure->isColumn($name) || $ignoreStructure) {
 				$column = $structure->column($name);
-				$parsed[$column->alias()] = $value;
+				$parsed[$column->alias()] = $column->parseValue($value);
 			}
 		}
 
