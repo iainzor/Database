@@ -146,14 +146,10 @@ class SelectQuery extends AbstractQuery
 	 */
 	public function fetchColumn(array $params = [], $column = 0)
 	{
-		$row = $this->fetchRow($params);
-		if ($row) {
-			$keys = array_keys($row);
-			if (isset($keys[$column])) {
-				return $row[$keys[$column]];
-			}
-		}
-		return null;
+		$sql = $this->generateSQL();
+		$column = $this->db()->fetchColumn($sql, $params, $column);
+		
+		return $column;
 	}
 	
 	/**
