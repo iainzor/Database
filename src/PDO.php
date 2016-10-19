@@ -256,12 +256,6 @@ class PDO extends \PDO
 		if (is_array($string)) {
 			throw new \Exception("Expected string, got array");
 		}
-		
-		try {
-			$quoted = parent::quote($string, $parameter_type);
-		} catch (\Exception $e) {
-			throw $e;
-		}
-		return $quoted;
+		return parent::quote($string, $parameter_type);
 	}
 }
