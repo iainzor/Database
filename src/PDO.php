@@ -173,9 +173,10 @@ class PDO extends \PDO
 	 * 
 	 * @see \PDO::exec()
 	 * @param string $statement
+	 * @param array $params Binding parameters for the query
 	 * @return int
 	 */
-	public function exec($statement) 
+	public function exec($statement, array $params = []) 
 	{
 		$exception = false;
 		$startTime = microtime(true);
@@ -184,7 +185,10 @@ class PDO extends \PDO
 		];
 		
 		try {
-			$result = parent::exec($statement);
+			
+			$stmt = $this->prepare($statement);
+			$stmt->execute($params);
+			$result = $stmt->rowCount();
 		} catch (\PDOException $e) {
 			$log["error"] = $e->getMessage();
 			$exception = $e;

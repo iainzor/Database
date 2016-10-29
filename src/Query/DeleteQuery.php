@@ -23,11 +23,11 @@ class DeleteQuery extends AbstractQuery
 	 * 
 	 * @return int The number of rows that were deleted
 	 */
-	public function execute()
+	public function execute(array $params = [])
 	{
 		$factory = $this->db()->driverFactory();
 		$sql = $factory->sqlGenerator()->generate($this);
-
-		return $this->db()->exec($sql);
+		
+		return $this->db()->exec($sql, $params);
 	}
 }
