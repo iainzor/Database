@@ -255,4 +255,11 @@ class PDO extends \PDO
 		
 		return $this->tables[$tableName];
 	}
+	
+	public function quote($string, $parameter_type = self::PARAM_STR) {
+		if (is_array($string)) {
+			throw new \Exception("Expected string, got array");
+		}
+		return parent::quote($string, $parameter_type);
+	}
 }

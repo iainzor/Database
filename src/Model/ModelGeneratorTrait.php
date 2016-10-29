@@ -15,7 +15,7 @@ trait ModelGeneratorTrait
 		if ($this instanceof ModelGeneratorInterface) {
 			$model = $this->createModelInstance();
 			if (!($model instanceof ModelInterface)) {
-				throw new \Exception("Model must be an instance of \\Database\\Model\\ModelInterface");
+				throw new \Exception("Model must be an instance of \\Database\\Model\\ModelInterface, ". get_class($model) ." given");
 			}
 			AbstractModel::populate($model, $properties);
 
