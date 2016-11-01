@@ -183,9 +183,9 @@ class WhereClauseGenerator
 				$columnName = $column->name();
 			} else if (empty($matches[2])) {
 				$columnAlias = $matches[1];
-				$column = $this->baseTable->column($columnAlias);
+				$column = $this->baseQuery ? $this->baseQuery->findColumn($columnAlias) : $this->baseTable->column($columnAlias);
 				$columnName = $column->name();
-				$tableName = $this->baseTable->alias();
+				$tableName = $column->table()->alias();
 			} else {
 				$tableName = $matches[1];
 				$columnName = $matches[2];
