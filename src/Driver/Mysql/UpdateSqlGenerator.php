@@ -1,7 +1,8 @@
 <?php
 namespace Database\Driver\Mysql;
 
-use Database\Query\UpdateQuery;
+use Database\Query\UpdateQuery,
+	Database\Table\ColumnExpr;
 
 class UpdateSqlGenerator
 {
@@ -67,7 +68,16 @@ class UpdateSqlGenerator
 		
 		foreach ($values as $name => $value) {
 			if ($structure->isColumn($name)) {
-				$sets[] = "`{$name}` = ". $db->quote($value);
+				$column = $structure->column($name);
+				$set = ["`{$column->name()}`"];
+				
+				if ($value instanceof ColumnExpr) {
+					$set[] = $value->expr();
+				} else {
+					$set[] = $db->quote($value);
+				}
+				
+				$sets[] = implode("=", $set);
 			}
 		}
 		
