@@ -40,12 +40,14 @@ class GroupClauseGenerator
 	public function generate()
 	{
 		$parts = [];
+		$whereGroups = [];
 		foreach ($this->groupings as $expr) {
 			if (!($expr instanceof GroupExpr)) {
 				throw new \InvalidArgumentException("Group expression must be an instance of GroupExpr");
 			}
 			
 			$column = $expr->column();
+			$whereGroups = array_merge($whereGroups, $expr->whereGroups());
 			
 			if ($column instanceof Column) {
 				$table = $column->table();
@@ -57,6 +59,16 @@ class GroupClauseGenerator
 			}
 		}
 		
-		return count($parts) ? "GROUP BY ". implode(", ", $parts) : null;
+		$clause = null;
+		if (count($parts)) {
+			$clause = "GROUP BY ". implode(", ", $parts);
+		
+			if (count($whereGroups)) {
+				$whereGenerator = new WhereClauseGenerator($this->table, $whereGroups);
+				$clause .= " ". $whereGenerator->generate("HAVING");
+			}
+		}
+		
+		return $clause;
 	}
 }

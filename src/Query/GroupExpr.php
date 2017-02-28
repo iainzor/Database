@@ -6,6 +6,8 @@ use Database\Table\Column,
 
 class GroupExpr
 {
+	use Traits\WhereTrait;
+	
 	/**
 	 * @var AbstractQuery
 	 */

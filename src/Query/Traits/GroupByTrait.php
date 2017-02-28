@@ -15,11 +15,13 @@ trait GroupByTrait
 	 * Add a column to group results by
 	 * 
 	 * @param string|Column|ColumnExpr $column
+	 * @return GroupExpr
 	 */
 	public function groupBy($column)
 	{
 		$expr = new GroupExpr($this, $column);
 		$this->groupings[] = $expr;
+		return $expr;
 	}
 	
 	/**
