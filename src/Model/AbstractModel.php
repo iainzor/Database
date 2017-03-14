@@ -21,4 +21,25 @@ abstract class AbstractModel extends Component implements ModelInterface
 		}
 		return $this->getSet($field, $value, self::VALUE_INT);
 	}
+	
+	public function set($property, $value)
+	{
+		$this->setProperties([
+			$property => $value
+		]);
+	}
+	
+	public function toBasicArray() 
+	{
+		return $this->toArray();
+	}
+	
+	public function __call($name, array $args) 
+	{
+		$value = null;
+		if (isset($args[0])) {
+			$value = $args[0];
+		}
+		return $this->getSet($name, $value);
+	}
 }

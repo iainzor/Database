@@ -40,13 +40,15 @@ class VirtualTable extends AbstractTable
 	{
 		$structure = new Structure();
 		foreach ($this->query->columns() as $columnName => $columnAlias) {
-			if (!is_numeric($columnName)) {
+			if (is_numeric($columnName)) {
 				$columnName = $columnAlias;
 			}
 			
-			$structure->column($columnName, [
-				"type" => "varchar"
-			]);
+			if (is_string($columnName)) {
+				$structure->column($columnName, [
+					"type" => "varchar"
+				]);
+			}
 		}
 		$this->structure($structure);
 	}
