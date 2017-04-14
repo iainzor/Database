@@ -22,6 +22,7 @@ abstract class AbstractModel extends Component implements ModelInterface
 		return $this->getSet($field, $value, self::VALUE_INT);
 	}
 	
+	/*
 	public function set($property, $value)
 	{
 		$this->setProperties([
@@ -42,4 +43,5 @@ abstract class AbstractModel extends Component implements ModelInterface
 		}
 		return $this->getSet($name, $value);
 	}
+	*/
 }
