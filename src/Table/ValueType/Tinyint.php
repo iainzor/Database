@@ -1,5 +1,5 @@
 <?php
 namespace Database\Table\ValueType;
 
-class Tinyint extends Int
+class Tinyint extends IntType
 {}

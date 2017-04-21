@@ -139,6 +139,9 @@ class Column
 					$className = __NAMESPACE__ ."\\ValueType\\". ucfirst($type);
 					if (class_exists($className)) {
 						$instance = new $className();
+					} else if (class_exists($className ."Type")) {
+						$className = $className ."Type";
+						$instance = new $className();
 					}
 				}
 				
