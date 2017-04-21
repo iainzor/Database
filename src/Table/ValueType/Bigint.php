@@ -1,5 +1,5 @@
 <?php
 namespace Database\Table\ValueType;
 
-class Bigint extends Int
+class Bigint extends IntType
 {}
