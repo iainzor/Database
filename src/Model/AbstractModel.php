@@ -22,7 +22,7 @@ abstract class AbstractModel extends Component implements ModelInterface
 		return $this->getSet($field, $value, self::VALUE_INT);
 	}
 	
-	public function set($property, $value)
+	public function set($property, $value = null)
 	{
 		$this->setProperties([
 			$property => $value
@@ -34,7 +34,7 @@ abstract class AbstractModel extends Component implements ModelInterface
 		return $this->toArray();
 	}
 	
-	public function __call($name, array $args) 
+	public function __call($name, array $args = []) 
 	{
 		$value = null;
 		if (isset($args[0])) {
