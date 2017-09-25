@@ -182,7 +182,9 @@ class Column
 	 */
 	public function parseValue($value) 
 	{
-		if ($this->type) {
+		if ($value === null) {
+			return null;
+		} else if ($this->type) {
 			return $this->type->parseValue($value, $this->length);
 		}
 		return $value;

@@ -73,6 +73,8 @@ class UpdateSqlGenerator
 				
 				if ($value instanceof ColumnExpr) {
 					$set[] = $value->expr();
+				} else if ($value === null || $value === "") {
+					$set[] = "NULL";
 				} else {
 					$set[] = $db->quote($value);
 				}

@@ -14,9 +14,13 @@ abstract class AbstractModel extends Component implements ModelInterface
 	 */
 	protected function getSetDate($field, $value)
 	{
-		if ($value !== null) {
+		if (!empty($value)) {
 			if (!is_numeric($value)) {
-				$value = strtotime($value);
+				if (preg_match("/0*-*:*/i", $value)) {
+					$value = null;
+				} else {
+					$value = strtotime($value);
+				}
 			}
 		}
 		return $this->getSet($field, $value, self::VALUE_INT);
